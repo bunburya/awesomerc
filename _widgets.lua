@@ -1,5 +1,13 @@
 -- Define custom widgets and behaviour relating to them.
 
+require("vicious")
+
+-- Volume and power widgets are old and don't use vicious, the rest are newer
+-- and do use vicious.
+-- Volume and power use certain functionality (coloured output depending on
+-- volume/power level) which I can't replicate in vicious yet, so until I find
+-- better docs for vicious they stay that way.
+
 -- {{{ Volume textbox
 function get_volume(widget)
     -- Takes a widget which has a text value as an arg. Gets the current
@@ -72,4 +80,29 @@ dbus.add_match("system", batt_change)
 dbus.add_signal(pow_interface, update_batt)
 
 batt_widget = {batt_icon, batt_level}
+-- }}}
+
+-- {{{ RAM usage textbox
+-- Taken from Vicious article on Awesome wiki
+
+-- Initialize widget
+memwidget = widget({ type = "textbox" })
+-- Register widget
+-- $1 = percentage usage, $2 = actual usage, $3 = total available
+vicious.register(memwidget, vicious.widgets.mem, "RAM: $2MB ($1%)")
+
+-- }}}
+
+-- {{{ CPU usage textbox
+-- Taken from Vicious article on Awesome wiki
+
+-- Initialize widget
+cpuwidget = widget({ type = "textbox" })
+-- Register widget
+vicious.register(cpuwidget, vicious.widgets.cpu, "CPU: $1%")
+-- }}}
+
+-- {{{ Net usage textbox
+netwidget = widget({ type = "textbox" })
+vicious.register(netwidget, vicious.widgets.net, "NET: ${wlan0 up_kb}KB↑ ${wlan0 down_kb}KB↓")
 -- }}}

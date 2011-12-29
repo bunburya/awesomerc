@@ -6,9 +6,11 @@ mytextclock = awful.widget.textclock({ align = "right" })
 -- Create a systray
 mysystray = widget({ type = "systray" })
 
--- Create a separator
-separator = widget({ type = "textbox" })
-separator.text = ' '
+-- Create separators
+space_sep = widget({ type = "textbox" })
+space_sep.text = ' '
+bar_sep = widget({type = "textbox" })
+bar_sep.text = ' | '
 
 -- Create a taskbar, infobar and related widgets for each screen and add them
 mytaskbar = {}
@@ -86,7 +88,7 @@ for s = 1, screen.count() do
         {
         mylauncher,
         mytaglist[s],
-        separator,
+        space_sep,
         mypromptbox[s],
         layout = awful.widget.layout.horizontal.leftright
         },
@@ -96,14 +98,24 @@ for s = 1, screen.count() do
         vol_icon,
         batt_level,
         batt_icon,
-        s == 1 and separator, mysystray or nil,
-        separator,
+        s == 1 and space_sep, mysystray or nil,
+        space_sep,
         mytasklist[s],
         layout = awful.widget.layout.horizontal.rightleft
     }
     -- Create the infobar
     myinfobar[s] = awful.wibox({position = "bottom", screen = s, ontop = true})
     myinfobar[s].visible = info_vis
+    
+    -- Add widgets to the infobar
+    myinfobar[s].widgets = {
+        memwidget,
+        bar_sep,
+        cpuwidget,
+        bar_sep,
+        netwidget,
+        layout = awful.widget.layout.horizontal.leftright
+    }
     
 end
 -- }}}

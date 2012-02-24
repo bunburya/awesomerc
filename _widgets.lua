@@ -92,17 +92,29 @@ memwidget = widget({ type = "textbox" })
 vicious.register(memwidget, vicious.widgets.mem, "RAM: $2MB ($1%)")
 
 -- }}}
-
+ 
 -- {{{ CPU usage textbox
 -- Taken from Vicious article on Awesome wiki
-
--- Initialize widget
 cpuwidget = widget({ type = "textbox" })
--- Register widget
 vicious.register(cpuwidget, vicious.widgets.cpu, "CPU: $1%")
 -- }}}
+
+-- {{{ Thermal info textbox
+tempwidget = widget({ type = "textbox" })
+vicious.register(tempwidget, vicious.widgets.thermal, "TEMP: $1°C", nil, "thermal_zone0")
+--- }}}
 
 -- {{{ Net usage textbox
 netwidget = widget({ type = "textbox" })
 vicious.register(netwidget, vicious.widgets.net, "NET: ${wlan0 up_kb}KB↑ ${wlan0 down_kb}KB↓")
+-- }}}
+
+-- {{{ Hard drive usage textbox
+hdwidget = widget({ type = "textbox" })
+vicious.register(hdwidget, vicious.widgets.fs, "HD: ${/ used_gb}GB/${/ size_gb}GB")
+-- }}}
+
+-- {{{ Pending upgrades textbox
+udwidget = widget({ type = "textbox" })
+vicious.register(udwidget, vicious.widgets.pkg, "UPDATES: $1", nil, "Arch")
 -- }}}

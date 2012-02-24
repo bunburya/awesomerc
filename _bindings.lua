@@ -92,7 +92,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "t",     function() awful.util.spawn(terminal) end),
     awful.key({ modkey, "Shift"   }, "t",     function() awful.util.spawn("tilda") end),
     awful.key({ modkey,           }, "g",     function() awful.util.spawn("geany") end),
-    awful.key({ modkey,           }, "w",     function() awful.util.spawn("libreoffice -writer") end),
+    awful.key({ modkey, "Shift"   }, "w",     function() awful.util.spawn("libreoffice -writer") end),
     awful.key({ modkey,           }, "s",     function() awful.util.spawn("xrandr -s 1280x800") end),
     awful.key({ modkey,           }, "i",     function()
                                                   info_vis = not info_vis
@@ -100,6 +100,7 @@ globalkeys = awful.util.table.join(
                                                       myinfobar[s].visible = info_vis
                                                   end
                                               end),
+    awful.key({ modkey,           }, "u",     function() awful.util.spawn(terminal .. " -e yaourt -Syua && exit") end),
     
     
     -- Suspend on pressing the button to the right of power button

@@ -46,7 +46,7 @@ progmenu = {
     { "geany", "geany" },
     { "nano", "nano" },
     { "python", python },
-    { "tutorials", "pcmanfm /home/alan/Tutorials" }
+    { "tutorials", "pcmanfm /home/alan/tutorials" }
 }
 
 sysmenu = {

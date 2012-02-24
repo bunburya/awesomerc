@@ -113,7 +113,13 @@ for s = 1, screen.count() do
         bar_sep,
         cpuwidget,
         bar_sep,
+        tempwidget,
+        bar_sep,
         netwidget,
+        bar_sep,
+        hdwidget,
+        bar_sep,
+        udwidget,
         layout = awful.widget.layout.horizontal.leftright
     }
     

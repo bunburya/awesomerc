@@ -26,7 +26,5 @@ awful.rules.rules = {
       properties = { tag = tags[1][3] } },
     { rule = { class = "Sonata" },
       properties = { tag = tags[1][4] } },
-    { rule = { name = "ncmpc++ ver. 0.5.6" },
-      properties = { tag = tags[1][5] } }
 }
 -- }}}

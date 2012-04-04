@@ -35,6 +35,9 @@ end
 -- Variable definitions
 require("_definitions")
 
+-- Initialise theme, set wallpaper
+beautiful.init(themerc)
+
 -- {{{ Tags
 -- Define tags table.
 tags = {}

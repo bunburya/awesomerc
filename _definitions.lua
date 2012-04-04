@@ -1,11 +1,11 @@
 -- {{{ Variable definitions
--- Themes define colours, icons, and wallpapers
-beautiful.init("/home/alan/.config/awesome/themes/custom/theme.lua")
+-- Path to theme.lua, the script governing our custom theme.
+themerc = "/home/alan/.config/awesome/themes/custom/theme.lua"
 
 -- Shutdown, suspend and restart
 shutdown = "sudo shutdown -h now"
 reboot = "sudo reboot"
-suspend = "sudo s2ram -f"
+suspend = "sudo pm-suspend"
 
 -- Browser
 browser = "firefox"
@@ -30,9 +30,10 @@ function sleep (n)
     os.execute("sleep " .. tonumber(n))
 end
 
--- Run a program only if it is not already running.
+
 function run_once(prg)
-  awful.util.spawn_with_shell("pgrep -u $USER -x " .. prg .. " || (" .. prg .. ")")
+    -- Run a program only if it is not already running.
+    awful.util.spawn_with_shell("pgrep -u $USER -x " .. prg .. " || (" .. prg .. ")")
 end
 
 -- Default modkey.
@@ -59,3 +60,5 @@ layouts =
     awful.layout.suit.magnifier
 }
 -- }}}
+
+

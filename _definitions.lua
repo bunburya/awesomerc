@@ -8,7 +8,7 @@ reboot = "sudo reboot"
 suspend = "sudo pm-suspend"
 
 -- Browser
-browser = "firefox"
+browser = "firefox-beta-bin"
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvt"
@@ -20,7 +20,7 @@ python = terminal .. " -e python"
 fm = "pcmanfm"
 
 -- Directory to which screenshots are to be saved
-scrn_dir = "/home/alan/pictures/screenshots"
+scrn_dir = "/home/alan/pics/screenshots"
 
 -- Whether the info bar at the bottom is visible
 info_vis = false

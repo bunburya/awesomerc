@@ -70,11 +70,11 @@ globalkeys = awful.util.table.join(
     -- Custom keybindings mostly begin here
     
     -- Volume control
-    awful.key({ }, "XF86AudioLowerVolume", function () awful.util.spawn("amixer -c Intel sset Master playback 5%-")
+    awful.key({ modkey, }, "F7", function () awful.util.spawn("amixer -c 0 sset Master playback 5%-")
                                                        get_volume(vol_level) end),
-    awful.key({ }, "XF86AudioRaiseVolume", function () awful.util.spawn("amixer -c Intel sset Master playback 5%+")
+    awful.key({ modkey, }, "F8", function () awful.util.spawn("amixer -c 0 sset Master playback 5%+")
                                                        get_volume(vol_level) end),
-    awful.key({ }, "XF86AudioMute", function () awful.util.spawn("amixer -c Intel sset Master playback toggle")
+    awful.key({ modkey, }, "F6", function () awful.util.spawn("amixer -c 0 sset Master playback toggle")
                                                 get_volume(vol_level) end),
     
     -- Music control, assumes MPD handles music with MPC installed.
@@ -93,15 +93,16 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "t",     function() awful.util.spawn("tilda") end),
     awful.key({ modkey,           }, "g",     function() awful.util.spawn("geany") end),
     awful.key({ modkey, "Shift"   }, "w",     function() awful.util.spawn("libreoffice -writer") end),
-    awful.key({ modkey,           }, "s",     function() awful.util.spawn("xrandr -s 1280x800") end),
     awful.key({ modkey,           }, "i",     function()
                                                   info_vis = not info_vis
                                                   for s = 1, screen.count() do
                                                       myinfobar[s].visible = info_vis
                                                   end
                                               end),
-    awful.key({ modkey,           }, "u",     function() awful.util.spawn(terminal .. " -e yaourt -Syua && exit") end),
-    
+    awful.key({ modkey,           }, "u",     function() awful.util.spawn(terminal .. " -e yaourt -Syua && exit || read") end),
+    -- sleep() is required in this next line to give awesome time to hand control of the keyboard over to scrot
+    awful.key({ modkey,           }, "s",     function() sleep(0.5); awful.util.spawn("sshost") end),
+    awful.key({ modkey, "Shift"   }, "s",     function() awful.util.spawn("sshost fs") end),
     
     -- Suspend on pressing the button to the right of power button
     awful.key({ }, "XF86Launch1", function () awful.util.spawn(suspend) end)

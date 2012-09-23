@@ -1,6 +1,6 @@
 -- Define custom widgets and behaviour relating to them.
 
-require("vicious")
+vicious = require("vicious")
 
 -- Volume and power widgets are old and don't use vicious, the rest are newer
 -- and do use vicious.
@@ -12,7 +12,7 @@ require("vicious")
 function get_volume(widget)
     -- Takes a widget which has a text value as an arg. Gets the current
     -- audio volume, formats it and sets it as the text value of the widget.
-	local info = io.popen("amixer -c Intel sget Master"):read("*all")
+	local info = io.popen("amixer -c 0 sget Master"):read("*all")
 	local level, mute_status = string.match(info, "%[(%d+%%)%] %[%-*%d+%.%d+dB%] %[(%a+)%]")
 	text = " <b>" .. level .. "</b>"
     if mute_status == "off" then
@@ -111,7 +111,7 @@ vicious.register(netwidget, vicious.widgets.net, "NET: ${wlan0 up_kb}KB↑ ${wla
 
 -- {{{ Hard drive usage textbox
 hdwidget = widget({ type = "textbox" })
-vicious.register(hdwidget, vicious.widgets.fs, "HD: ${/ used_gb}GB/${/ size_gb}GB")
+vicious.register(hdwidget, vicious.widgets.fs, "HD: / ${/ used_gb}GB/${/ size_gb}GB /home ${/home used_gb}GB/${/home size_gb}GB")
 -- }}}
 
 -- {{{ Pending upgrades textbox

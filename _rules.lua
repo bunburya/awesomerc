@@ -18,13 +18,11 @@ awful.rules.rules = {
 
     -- Set certain programs to open on specific tags.
     -- NB tags start at 1, not 0.
---    { rule = { class = "Firefox" },
---      properties = { tag = tags[1][1] } },
+    { rule = { class = "Firefox" },
+      properties = { tag = tags[1][1] } },
     { rule = { class = "Thunderbird" },
       properties = { tag = tags[1][2] } },
     { rule = { class = "Liferea" },
       properties = { tag = tags[1][3] } },
-    { rule = { class = "Sonata" },
-      properties = { tag = tags[1][4] } },
 }
 -- }}}

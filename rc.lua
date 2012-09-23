@@ -43,8 +43,8 @@ beautiful.init(themerc)
 tags = {}
 -- Unless there is a compelling reason to do otherwise, add new tags to the end.
 -- Otherwise we have to go and change the rules relating to specific apps later on.
-names = { "general", "email", "study", "prog", "misc" }
-tag_layouts = { 1, 10, 10, 3, 3 }
+names = { "general", "email", "blogs", "study", "prog", "misc" }
+tag_layouts = { 1, 10, 10, 10, 3, 3 }
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
     tags[s] = {}

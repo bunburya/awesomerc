@@ -1,28 +1,23 @@
 -- {{{ Menu
 
 gamesmenu = {
-    { "AoE 2", "/home/alan/games/wine/aoe2" },
     { "armagetron", "armagetronad" },
     { "biniax-2", "biniax2" },
-    { "CM 5", "/home/alan/games/wine/cm5" }, 
     { "corsix-th", "CorsixTH" },
-    { "dopewars", "dopewars" },
     { "et", "et" },
-    { "freeciv", "freeciv" },
     { "gweled", "gweled" },
     { "openttd", "openttd"},
     { "sauerbraten", "sauerbraten-client" },
     { "supertuxkart", "supertuxkart" },
-    { "warzone", "warzone2100" },
+    { "warzone 2100", "warzone2100" },
     { "wesnoth", "wesnoth" }
 }
 
 netmenu = {
-    { "nm-applet", "nm-applet" },
+    { "wicd", "wicd-client" },
     { "firefox", browser },
     { "elinks", terminal.." -e elinks" },
     { "thunderbird", "thunderbird" },
-    { "liferea", "liferea" },
     { "chat", terminal.." -e irssi" }
 }
 
@@ -37,16 +32,16 @@ officemenu = {
 
 mediamenu = {
     { "mplayer", "/home/alan/bin/mplay" },
-    { "ncmpcpp", terminal .. "-e ncmpcpp" },
-    { "mpd", "/home/alan/bin/mpdstart" },
+    { "spotify", "spotify" },
+    { "vlc", "vlc" }
 }
 
 progmenu = {
     { "cmake", "cmake-gui" },
     { "geany", "geany" },
-    { "nano", "nano" },
-    { "python", python },
-    { "tutorials", "pcmanfm /home/alan/tutorials" }
+    { "vim", terminal .. " -e vim" },
+    { "python", terminal .. " -e python" },
+    { "tutorials", fm .. " /home/alan/tutorials" }
 }
 
 sysmenu = {
@@ -72,6 +67,9 @@ mymainmenu = awful.menu({ items = {
                                   }
                         })
  
-mylauncher = awful.widget.launcher({ image = image(beautiful.arch_icon),
+mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
                                      menu = mymainmenu })
+
+menubar.utils.terminal = terminal -- Set the terminal for applications that require it
+
 -- }}}

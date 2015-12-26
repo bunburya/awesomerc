@@ -3,12 +3,12 @@
 themerc = "/home/alan/.config/awesome/themes/custom/theme.lua"
 
 -- Shutdown, suspend and restart
-shutdown = "sudo shutdown -h now"
-reboot = "sudo reboot"
-suspend = "sudo pm-suspend"
+shutdown = "shutdown -h now"
+reboot = "reboot"
+suspend = "pm-suspend"
 
 -- Browser
-browser = "firefox-beta-bin"
+browser = "firefox"
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvt"
@@ -60,5 +60,4 @@ layouts =
     awful.layout.suit.magnifier
 }
 -- }}}
-
 

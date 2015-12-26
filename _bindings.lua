@@ -1,5 +1,3 @@
-require("_widgets")
-
 -- {{{ Mouse bindings
 root.buttons(awful.util.table.join(
     awful.button({ }, 3, function () mymainmenu:toggle() end),
@@ -70,26 +68,26 @@ globalkeys = awful.util.table.join(
     -- Custom keybindings mostly begin here
     
     -- Volume control
-    awful.key({ modkey, }, "F7", function () awful.util.spawn("amixer -c 0 sset Master playback 5%-")
+    awful.key({ modkey, }, "XF86AudioLowerVolume", function () awful.util.spawn("amixer -c 0 sset Master playback 5%-")
                                                        get_volume(vol_level) end),
-    awful.key({ modkey, }, "F8", function () awful.util.spawn("amixer -c 0 sset Master playback 5%+")
+    awful.key({ modkey, }, "XF86AudioRaiseVolume", function () awful.util.spawn("amixer -c 0 sset Master playback 5%+")
                                                        get_volume(vol_level) end),
-    awful.key({ modkey, }, "F6", function () awful.util.spawn("amixer -c 0 sset Master playback toggle")
+    awful.key({ modkey, }, "XF86AudioMute", function () awful.util.spawn("amixer -c 0 sset Master playback toggle")
                                                 get_volume(vol_level) end),
     
     -- Music control, assumes MPD handles music with MPC installed.
     -- Also assumes there is a graphical MPD client (eg gmpc) open, to provide notification on song changes.
-    awful.key({ }, "XF86AudioStop", function() awful.util.spawn("mpc stop") end),
-    awful.key({ }, "XF86AudioPlay", function() awful.util.spawn("mpc toggle") end), 
-    awful.key({ }, "XF86AudioPrev", function() awful.util.spawn("mpc prev") end),
-    awful.key({ }, "XF86AudioNext", function() awful.util.spawn("mpc next") end),
-    awful.key({ modkey,           }, "XF86AudioPlay", function() naughty.notify({ text = io.popen("mpc"):read("*all"), title = "MPD status" }) end),
+    -- NOTE: We won'tbe using mpd so find a way to make these control spotify
+    --awful.key({ }, "XF86AudioStop", function() awful.util.spawn("mpc stop") end),
+    --awful.key({ }, "XF86AudioPlay", function() awful.util.spawn("mpc toggle") end), 
+    --awful.key({ }, "XF86AudioPrev", function() awful.util.spawn("mpc prev") end),
+    --awful.key({ }, "XF86AudioNext", function() awful.util.spawn("mpc next") end),
+    --awful.key({ modkey,           }, "XF86AudioPlay", function() naughty.notify({ text = io.popen("mpc"):read("*all"), title = "MPD status" }) end),
     
     -- Common applications
     awful.key({ modkey,           }, "b",     function() awful.util.spawn(browser) end),
     awful.key({ modkey,           }, "p",     function() awful.util.spawn(terminal .. " -e python") end),
     awful.key({ modkey,           }, "Prior", function() awful.util.spawn(fm) end),
-    awful.key({ modkey,           }, "t",     function() awful.util.spawn(terminal) end),
     awful.key({ modkey, "Shift"   }, "t",     function() awful.util.spawn("tilda") end),
     awful.key({ modkey,           }, "g",     function() awful.util.spawn("geany") end),
     awful.key({ modkey, "Shift"   }, "w",     function() awful.util.spawn("libreoffice -writer") end),
@@ -102,10 +100,10 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "u",     function() awful.util.spawn(terminal .. " -e yaourt -Syua && exit || read") end),
     -- sleep() is required in this next line to give awesome time to hand control of the keyboard over to scrot
     awful.key({ modkey,           }, "s",     function() sleep(0.5); awful.util.spawn("sshost") end),
-    awful.key({ modkey, "Shift"   }, "s",     function() awful.util.spawn("sshost fs") end),
+    awful.key({ modkey, "Shift"   }, "s",     function() awful.util.spawn("sshost fs") end)
     
     -- Suspend on pressing the button to the right of power button
-    awful.key({ }, "XF86Launch1", function () awful.util.spawn(suspend) end)
+    --awful.key({ }, "XF86Launch1", function () awful.util.spawn(suspend) end)
     
 
 )
@@ -116,7 +114,6 @@ clientkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
     awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
     awful.key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
-    awful.key({ modkey, "Shift"   }, "r",      function (c) c:redraw()                       end),
     awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end),
     awful.key({ modkey,           }, "n",
         function (c)

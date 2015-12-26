@@ -18,13 +18,13 @@ function get_volume(widget)
     if mute_status == "off" then
         text = "<span color=\"red\">" .. text .. "</span>"
     end
-	widget.text = text
+	widget:set_markup(text)
 end
 
-vol_level = widget({ type = "textbox" })
+vol_level = wibox.widget.textbox()
 get_volume(vol_level)
-vol_icon = widget({ type = "imagebox" })
-vol_icon.image = image("/home/alan/.config/awesome/themes/custom/volume.png")
+vol_icon = wibox.widget.imagebox()
+vol_icon:set_image("/home/alan/.config/awesome/themes/custom/speaker.png")
 vol_widget = {vol_icon, vol_level}
 -- }}}
 
@@ -53,31 +53,31 @@ function get_batt(widget)
 			end
 		elseif dis_charge == "Charging" then
 			text = " <b>" .. level .. "%+</b> "
-		elseif dis_charge == "Unknown" then     -- Battery is full, and AC plugged in.
+		elseif dis_charge == "Full" then     -- Battery is full, and AC plugged in.
 			text = ' <b><span color="green">' .. level .. '%</span></b> '
 		end
 	end
-	widget.text = text
+	widget:set_markup(text)
 end
 
 
-batt_icon = widget({ type = "imagebox" })
-batt_icon.image = image("/home/alan/.config/awesome/themes/custom/battery.png")
-batt_level = widget({ type = "textbox" })
+batt_icon = wibox.widget.imagebox()
+batt_icon:set_image("/home/alan/.config/awesome/themes/custom/battery.png")
+batt_level = wibox.widget.textbox()
 function update_batt()
     get_batt(batt_level)
 end
 update_batt()
 batt_update_timer = timer({ timeout = 30 })
 
-batt_update_timer:add_signal("timeout", update_batt)
+batt_update_timer:connect_signal("timeout", update_batt)
 batt_update_timer:start()
 pow_interface = "org.freedesktop.UPower.Device"
 acad_change = "type='signal',interface='"..pow_interface.."',path='/org/freedesktop/UPower/devices/line_power_ACAD',member='Changed'"
 batt_change = "type='signal',interface='"..pow_interface.."',path='/org/freedesktop/UPower/devices/battery_BAT1',member='Changed'"
 dbus.add_match("system", acad_change)
 dbus.add_match("system", batt_change)
-dbus.add_signal(pow_interface, update_batt)
+dbus.connect_signal(pow_interface, update_batt)
 
 batt_widget = {batt_icon, batt_level}
 -- }}}
@@ -86,35 +86,35 @@ batt_widget = {batt_icon, batt_level}
 -- Taken from Vicious article on Awesome wiki
 
 -- Initialize widget
-memwidget = widget({ type = "textbox" })
+memwidget = wibox.widget.textbox()
 -- Register widget
 -- $1 = percentage usage, $2 = actual usage, $3 = total available
-vicious.register(memwidget, vicious.widgets.mem, "RAM: $2MB ($1%)")
+vicious.register(memwidget, vicious.widgets.mem, "<b>RAM:</b> $2 MB ($1%)")
 
 -- }}}
  
 -- {{{ CPU usage textbox
 -- Taken from Vicious article on Awesome wiki
-cpuwidget = widget({ type = "textbox" })
-vicious.register(cpuwidget, vicious.widgets.cpu, "CPU: $1%")
+cpuwidget = wibox.widget.textbox()
+vicious.register(cpuwidget, vicious.widgets.cpu, "<b>CPU:</b> $1%")
 -- }}}
 
 -- {{{ Thermal info textbox
-tempwidget = widget({ type = "textbox" })
-vicious.register(tempwidget, vicious.widgets.thermal, "TEMP: $1°C", nil, "thermal_zone0")
+tempwidget = wibox.widget.textbox()
+vicious.register(tempwidget, vicious.widgets.thermal, "<b>TEMP:</b> $1°C", nil, "thermal_zone0")
 --- }}}
 
 -- {{{ Net usage textbox
-netwidget = widget({ type = "textbox" })
-vicious.register(netwidget, vicious.widgets.net, "NET: ${wlan0 up_kb}KB↑ ${wlan0 down_kb}KB↓")
+netwidget = wibox.widget.textbox()
+vicious.register(netwidget, vicious.widgets.net, "<b>NET:</b> ${wlp6s0 up_kb} KB ↑ ${wlp6s0 down_kb} KB ↓")
 -- }}}
 
 -- {{{ Hard drive usage textbox
-hdwidget = widget({ type = "textbox" })
-vicious.register(hdwidget, vicious.widgets.fs, "HD: / ${/ used_gb}GB/${/ size_gb}GB /home ${/home used_gb}GB/${/home size_gb}GB")
+hdwidget = wibox.widget.textbox()
+vicious.register(hdwidget, vicious.widgets.fs, "<b>HD:</b> ${/ used_gb} GB / ${/ size_gb} GB")
 -- }}}
 
 -- {{{ Pending upgrades textbox
-udwidget = widget({ type = "textbox" })
-vicious.register(udwidget, vicious.widgets.pkg, "UPDATES: $1", nil, "Arch")
+udwidget = wibox.widget.textbox()
+vicious.register(udwidget, vicious.widgets.pkg, "<b>UPDATES:</b> $1", nil, "Arch")
 -- }}}

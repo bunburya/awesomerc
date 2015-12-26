@@ -1,23 +1,19 @@
+-- {{{ Wibox
+
 require("_widgets")
 
+bar_sep = wibox.widget.textbox()
+bar_sep:set_text(" | ")
+space_sep = wibox.widget.textbox()
+space_sep:set_text(" ")
+
+-- TOP BAR
+
 -- Create a textclock widget
-mytextclock = awful.widget.textclock({ align = "right" })
+mytextclock = awful.widget.textclock()
 
--- Create a systray
-mysystray = widget({ type = "systray" })
-
--- Create separators
-space_sep = widget({ type = "textbox" })
-space_sep.text = ' '
-bar_sep = widget({type = "textbox" })
-bar_sep.text = ' | '
-
--- Create a taskbar, infobar and related widgets for each screen and add them
-mytaskbar = {}
-
--- aha, this code never gets executed. find out why.
--- once we figure this out, maybe we can move the toggle function in bindings
--- back to definitions
+-- Create a wibox for each screen and add it
+mywibox = {}
 myinfobar = {}
 mypromptbox = {}
 mylayoutbox = {}
@@ -27,8 +23,8 @@ mytaglist.buttons = awful.util.table.join(
                     awful.button({ modkey }, 1, awful.client.movetotag),
                     awful.button({ }, 3, awful.tag.viewtoggle),
                     awful.button({ modkey }, 3, awful.client.toggletag),
-                    awful.button({ }, 4, awful.tag.viewnext),
-                    awful.button({ }, 5, awful.tag.viewprev)
+                    awful.button({ }, 4, function(t) awful.tag.viewnext(awful.tag.getscreen(t)) end),
+                    awful.button({ }, 5, function(t) awful.tag.viewprev(awful.tag.getscreen(t)) end)
                     )
 mytasklist = {}
 mytasklist.buttons = awful.util.table.join(
@@ -36,6 +32,9 @@ mytasklist.buttons = awful.util.table.join(
                                               if c == client.focus then
                                                   c.minimized = true
                                               else
+                                                  -- Without this, the following
+                                                  -- :isvisible() makes no sense
+                                                  c.minimized = false
                                                   if not c:isvisible() then
                                                       awful.tag.viewonly(c:tags()[1])
                                                   end
@@ -50,7 +49,9 @@ mytasklist.buttons = awful.util.table.join(
                                                   instance:hide()
                                                   instance = nil
                                               else
-                                                  instance = awful.menu.clients({ width=250 })
+                                                  instance = awful.menu.clients({
+                                                      theme = { width = 250 }
+                                                  })
                                               end
                                           end),
                      awful.button({ }, 4, function ()
@@ -64,7 +65,7 @@ mytasklist.buttons = awful.util.table.join(
 
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
-    mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
+    mypromptbox[s] = awful.widget.prompt()
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
     mylayoutbox[s] = awful.widget.layoutbox(s)
@@ -74,54 +75,64 @@ for s = 1, screen.count() do
                            awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
                            awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end)))
     -- Create a taglist widget
-    mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.label.all, mytaglist.buttons)
+    mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.filter.all, mytaglist.buttons)
 
     -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(function(c)
-                                              return awful.widget.tasklist.label.currenttags(c, s)
-                                          end, mytasklist.buttons)
+    mytasklist[s] = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, mytasklist.buttons)
 
-    -- Create the taskbar
-    mytaskbar[s] = awful.wibox({ position = "top", screen = s })
-    -- Add widgets to the taskbar - order matters
-    mytaskbar[s].widgets = {
-        {
-        mylauncher,
-        mytaglist[s],
-        space_sep,
-        mypromptbox[s],
-        layout = awful.widget.layout.horizontal.leftright
-        },
-        mylayoutbox[s],
-        mytextclock,
-        vol_level,
-        vol_icon,
-        batt_level,
-        batt_icon,
-        s == 1 and space_sep, mysystray or nil,
-        space_sep,
-        mytasklist[s],
-        layout = awful.widget.layout.horizontal.rightleft
-    }
+    -- Create the wibox
+    mywibox[s] = awful.wibox({ position = "top", screen = s })
+
+    -- Widgets that are aligned to the left
+    local left_layout = wibox.layout.fixed.horizontal()
+    left_layout:add(mylauncher)
+    left_layout:add(mytaglist[s])
+    left_layout:add(mypromptbox[s])
+
+    -- Widgets that are aligned to the right
+    local right_layout = wibox.layout.fixed.horizontal()
+    if s == 1 then right_layout:add(wibox.widget.systray()) end
+    right_layout:add(vol_icon)
+    right_layout:add(vol_level)
+    right_layout:add(space_sep)
+    right_layout:add(batt_icon)
+    right_layout:add(batt_level)
+    right_layout:add(mytextclock)
+    right_layout:add(mylayoutbox[s])
+
+    -- Now bring it all together (with the tasklist in the middle)
+    local layout = wibox.layout.align.horizontal()
+    layout:set_left(left_layout)
+    layout:set_middle(mytasklist[s])
+    layout:set_right(right_layout)
+
+    mywibox[s]:set_widget(layout)
+
+-- BOTTOM BAR
+
     -- Create the infobar
     myinfobar[s] = awful.wibox({position = "bottom", screen = s, ontop = true})
     myinfobar[s].visible = info_vis
     
-    -- Add widgets to the infobar
-    myinfobar[s].widgets = {
-        memwidget,
-        bar_sep,
-        cpuwidget,
-        bar_sep,
-        tempwidget,
-        bar_sep,
-        netwidget,
-        bar_sep,
-        hdwidget,
-        bar_sep,
-        udwidget,
-        layout = awful.widget.layout.horizontal.leftright
-    }
+    local infobar_data_layout = wibox.layout.fixed.horizontal()
+    infobar_data_layout:add(space_sep)
+    infobar_data_layout:add(memwidget)
+    infobar_data_layout:add(bar_sep)
+    infobar_data_layout:add(cpuwidget)
+    infobar_data_layout:add(bar_sep)
+    infobar_data_layout:add(tempwidget)
+    infobar_data_layout:add(bar_sep)
+    infobar_data_layout:add(netwidget)
+    infobar_data_layout:add(bar_sep)
+    infobar_data_layout:add(hdwidget)
+    infobar_data_layout:add(bar_sep)
+    infobar_data_layout:add(udwidget)
+    
+    local infobar_layout = wibox.layout.align.horizontal()
+    infobar_layout:set_left(infobar_data_layout)
+    
+    myinfobar[s]:set_widget(infobar_layout)
     
 end
+    
 -- }}}

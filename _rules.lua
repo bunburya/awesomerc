@@ -1,28 +1,24 @@
--- {{{ Rules
+-- Rules to apply to new clients (through the "manage" signal).
 awful.rules.rules = {
     -- All clients will match this rule.
     { rule = { },
       properties = { border_width = beautiful.border_width,
                      border_color = beautiful.border_normal,
-                     focus = true,
+                     focus = awful.client.focus.filter,
+                     raise = true,
                      keys = clientkeys,
-                     buttons = clientbuttons }  },
+                     buttons = clientbuttons } },
     { rule = { class = "MPlayer" },
+      properties = { floating = true } },
+    { rule = { class = "tilda" },
       properties = { floating = true } },
     { rule = { class = "pinentry" },
       properties = { floating = true } },
     { rule = { class = "gimp" },
       properties = { floating = true } },
-    { rule = { class = "Tilda" },
-      properties = { floating = true } },
-
-    -- Set certain programs to open on specific tags.
-    -- NB tags start at 1, not 0.
-    { rule = { class = "Firefox" },
-      properties = { tag = tags[1][1] } },
     { rule = { class = "Thunderbird" },
       properties = { tag = tags[1][2] } },
-    { rule = { class = "Liferea" },
-      properties = { tag = tags[1][3] } },
+    -- Set Firefox to always map on tags number 2 of screen 1.
+    -- { rule = { class = "Firefox" },
+    --   properties = { tag = tags[1][2] } },
 }
--- }}}

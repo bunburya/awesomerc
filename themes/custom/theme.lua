@@ -81,7 +81,9 @@ theme.titlebar_maximized_button_focus_active  = "/usr/share/awesome/themes/defau
 
 wallpapers = {}
 for file in lfs.dir(wallpaper_dir) do
-    table.insert(wallpapers, file)
+    if file ~= "." and file ~= ".." then
+        table.insert(wallpapers, file)
+    end
 end
 
 theme.wallpaper = wallpaper_dir .. wallpapers[math.random(1, #wallpapers)]

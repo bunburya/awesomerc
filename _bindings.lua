@@ -100,7 +100,8 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "u",     function() awful.util.spawn(terminal .. " -e yaourt -Syua && exit || read") end),
     -- sleep() is required in this next line to give awesome time to hand control of the keyboard over to scrot
     awful.key({ modkey,           }, "s",     function() sleep(0.5); awful.util.spawn("sshost") end),
-    awful.key({ modkey, "Shift"   }, "s",     function() awful.util.spawn("sshost fs") end)
+    awful.key({ modkey, "Shift"   }, "s",     function() awful.util.spawn("sshost fs") end),
+    awful.key({ modkey, "Shift"	  }, "m",	  function() awful.util.spawn("spotify") end)
     
     -- Suspend on pressing the button to the right of power button
     --awful.key({ }, "XF86Launch1", function () awful.util.spawn(suspend) end)

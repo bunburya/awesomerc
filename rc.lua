@@ -96,6 +96,15 @@ require("_rules")
 -- {{{ Signals
 -- Signal function to execute when a new client appears.
 client.connect_signal("manage", function (c, startup)
+    
+    if c["class"] == nil then -- messy workaround for spotify, which doesn't properly set class
+        c:connect_signal("property::class", function()
+                if c["class"] == "Spotify" then
+                    c:tags({ tags[1][3] })
+            end
+        end)
+    end
+    
     -- Enable sloppy focus
     c:connect_signal("mouse::enter", function(c)
         if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier

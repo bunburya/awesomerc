@@ -4,7 +4,7 @@
 -------------------------------------
 
 require("lfs")
-local wallpaper_dir = ('/home/alan/pics/wallpapers/')
+local wallpaper_dir = ('/home/alan/pics/backgrounds/')
 
 theme = {}
 

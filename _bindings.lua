@@ -68,21 +68,25 @@ globalkeys = awful.util.table.join(
     -- Custom keybindings mostly begin here
     
     -- Volume control
-    awful.key({ modkey, }, "XF86AudioLowerVolume", function () awful.util.spawn("amixer -c 0 sset Master playback 5%-")
+    awful.key({ modkey, }, "XF86AudioLowerVolume", function () awful.util.spawn("amixer -c 1 sset Master playback 5%-")
                                                        get_volume(vol_level) end),
-    awful.key({ modkey, }, "XF86AudioRaiseVolume", function () awful.util.spawn("amixer -c 0 sset Master playback 5%+")
+    awful.key({ modkey, }, "XF86AudioRaiseVolume", function () awful.util.spawn("amixer -c 1 sset Master playback 5%+")
                                                        get_volume(vol_level) end),
-    awful.key({ modkey, }, "XF86AudioMute", function () awful.util.spawn("amixer -c 0 sset Master playback toggle")
+    awful.key({ modkey, }, "XF86AudioMute", function () awful.util.spawn("amixer -c 1 sset Master playback toggle")
                                                 get_volume(vol_level) end),
     
     -- Music control, assumes MPD handles music with MPC installed.
     -- Also assumes there is a graphical MPD client (eg gmpc) open, to provide notification on song changes.
-    -- NOTE: We won'tbe using mpd so find a way to make these control spotify
+    -- NOTE: We won't be using mpd so find a way to make these control spotify
     --awful.key({ }, "XF86AudioStop", function() awful.util.spawn("mpc stop") end),
     --awful.key({ }, "XF86AudioPlay", function() awful.util.spawn("mpc toggle") end), 
     --awful.key({ }, "XF86AudioPrev", function() awful.util.spawn("mpc prev") end),
     --awful.key({ }, "XF86AudioNext", function() awful.util.spawn("mpc next") end),
     --awful.key({ modkey,           }, "XF86AudioPlay", function() naughty.notify({ text = io.popen("mpc"):read("*all"), title = "MPD status" }) end),
+    
+    -- Brightness control
+    awful.key({ modkey, }, "XF86MonBrightnessDown", function () awful.util.spawn ("xbacklight -dec 10") end),
+    awful.key({ modkey, }, "XF86MonBrightnessUp", function () awful.util.spawn ("xbacklight -inc 10") end),
     
     -- Common applications
     awful.key({ modkey,           }, "b",     function() awful.util.spawn(browser) end),

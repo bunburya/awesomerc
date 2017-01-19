@@ -8,6 +8,8 @@ awful.rules.rules = {
                      raise = true,
                      keys = clientkeys,
                      buttons = clientbuttons } },
+    { rule = { class = "URxvt" },
+      properties = { size_hints_honor = false } },
     { rule = { class = "MPlayer" },
       properties = { floating = true } },
     { rule = { class = "Tilda" },

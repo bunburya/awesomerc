@@ -3,13 +3,16 @@
 -- Path to theme.lua, the script governing our custom theme.
 themerc = "/home/alan/.config/awesome/themes/custom/theme.lua"
 
+-- Path to directory where the background images are stored
+wallpaper_dir = ('/home/alan/pics/backgrounds/')
+
 -- Shutdown, suspend and restart
 shutdown = "shutdown -h now"
 reboot = "reboot"
 suspend = "pm-suspend"
 
 -- Browser
-browser = "chromium"
+browser = "firefox"
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvt"

@@ -99,27 +99,27 @@ cpuwidget = wibox.widget.textbox()
 vicious.register(cpuwidget, vicious.widgets.cpu, "<b>CPU:</b> $1%")
 -- }}}
 
--- {{{ Thermal info textbox
-_temptextwidget = wibox.widget.textbox()
-_temptextwidget:set_markup("<b>TEMP:</b> ")
-_cputempwidget = wibox.widget.textbox()
-vicious.register(_cputempwidget, vicious.widgets.thermal, "CPU $1°C; ", nil, "thermal_zone1")
-_hddtempwidget = wibox.widget.textbox()
-vicious.register(_hddtempwidget, vicious.widgets.hddtemp, "HDD ${/dev/sda}°C")
-tempwidget = wibox.layout.fixed.horizontal()
-tempwidget:add(_temptextwidget)
-tempwidget:add(_cputempwidget)
-tempwidget:add(_hddtempwidget)
---- }}}
+-- {{{ Thermal info textbox *TEMPORARILY OUT OF ORDER*
+--_temptextwidget = wibox.widget.textbox()
+--_temptextwidget:set_markup("<b>TEMP:</b> ")
+--cputempwidget = wibox.widget.textbox()
+--vicious.register(_cputempwidget, vicious.widgets.thermal, "CPU $1°C; ", nil, "thermal_zone1")
+--_hddtempwidget = wibox.widget.textbox()
+--vicious.register(_hddtempwidget, vicious.widgets.hddtemp, "HDD ${/dev/sda}°C")
+--tempwidget = wibox.layout.fixed.horizontal()
+--tempwidget:add(_temptextwidget)
+--tempwidget:add(_cputempwidget)
+--tempwidget:add(_hddtempwidget)
+-- }}}
 
 -- {{{ Net usage textbox
 netwidget = wibox.widget.textbox()
-vicious.register(netwidget, vicious.widgets.net, "<b>NET:</b> ${wlan0 up_kb} KB ↑ ${wlan0 down_kb} KB ↓")
+vicious.register(netwidget, vicious.widgets.net, "<b>NET:</b> ${wlp6s0 up_kb} KB ↑ ${wlp6s0 down_kb} KB ↓")
 -- }}}
 
 -- {{{ Hard drive usage textbox
 hdwidget = wibox.widget.textbox()
-vicious.register(hdwidget, vicious.widgets.fs, "<b>HD:</b> root ${/ used_gb} GB / ${/ size_gb} GB; home ${/home used_gb} GB / ${/home size_gb} GB")
+vicious.register(hdwidget, vicious.widgets.fs, "<b>SSD:</b> ${/ used_gb} GB / ${/ size_gb} GB")
 -- }}}
 
 -- {{{ Pending upgrades textbox

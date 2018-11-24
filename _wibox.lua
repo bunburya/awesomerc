@@ -118,8 +118,8 @@ awful.screen.connect_for_each_screen(function(s)
         s.mytasklist, -- Middle widget
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
-            mykeyboardlayout,
             wibox.widget.systray(),
+            space_sep,
             vol_icon,
             vol_level,
             space_sep,
@@ -144,8 +144,8 @@ awful.screen.connect_for_each_screen(function(s)
     bar_sep,
     cpuwidget,
     bar_sep,
-    tempwidget,
-    bar_sep,
+    --tempwidget,
+    --bar_sep,
     netwidget,
     bar_sep,
     hdwidget,

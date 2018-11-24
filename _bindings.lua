@@ -154,7 +154,7 @@ globalkeys = awful.util.table.join(
                                                       s.myinfobar.visible = info_vis end)
                                               end,
                 {description = "toggle infobar", group = "system"}),
-    awful.key({ modkey,           }, "u",     function() awful.util.spawn(terminal .. " -e yaourt -Syua && exit || read") end,
+    awful.key({ modkey,           }, "u",     function() awful.util.spawn(terminal .. " -e trizen -Syu --noconfirm && read || read") end,
                 {description = "update", group = "system"}),
     -- sleep() is required in this next line to give awesome time to hand control of the keyboard over to scrot
     awful.key({ modkey,           }, "s",     function() sleep(0.5); awful.util.spawn("sshost") end,

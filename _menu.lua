@@ -2,20 +2,19 @@
 
 gamesmenu = {
     { "armagetron", "armagetronad" },
-    { "biniax-2", "biniax2" },
     { "corsix-th", "CorsixTH" },
-    { "et", "et" },
-    { "gweled", "gweled" },
     { "openttd", "openttd"},
-    { "sauerbraten", "sauerbraten-client" },
     { "supertuxkart", "supertuxkart" },
     { "warzone 2100", "warzone2100" },
-    { "wesnoth", "wesnoth" }
+    { "wesnoth", "wesnoth" },
+    { "morrowind", "openmw"},
+    { "nethack", terminal.." nethack" }
 }
 
 netmenu = {
     { "wicd", "wicd-client" },
-    { "firefox", browser },
+    { "firefox", "firefox" },
+    { "surf", "surf" },
     { "elinks", terminal.." -e elinks" },
     { "thunderbird", "thunderbird" },
     { "chat", terminal.." -e irssi" }
@@ -27,21 +26,20 @@ officemenu = {
     { "-calc", "libreoffice -calc" },
     { "-impress", "libreoffice -impress" },
     { "-writer", "libreoffice -writer" },
-    { "xpdf", "xpdf -cont" }
+    { "evince (pdf)", "evince" }
 }
 
 mediamenu = {
-    { "mplayer", "/home/alan/bin/mplay" },
     { "spotify", "spotify" },
-    { "vlc", "vlc" }
+    { "vlc", "vlc" },
+    { "mirage (images)", "mirage" }
 }
 
 progmenu = {
     { "cmake", "cmake-gui" },
     { "geany", "geany" },
     { "vim", terminal .. " -e vim" },
-    { "python", terminal .. " -e python" },
-    { "tutorials", fm .. " /home/alan/tutorials" }
+    { "python", terminal .. " -e python" }
 }
 
 sysmenu = {
@@ -49,7 +47,6 @@ sysmenu = {
     { "terminal", terminal },
     { "manual", terminal .. " -e man awesome" },
     { "configure", "geany " .. awesome.conffile },
-    { "hotkeys", function() return false, hotkeys_popup.show_help end},
     { "tasks", terminal .. " -e top" },
     { "restart", awesome.restart },
     { "logout", awesome.quit },

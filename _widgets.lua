@@ -96,20 +96,15 @@ vicious.register(memwidget, vicious.widgets.mem, "<b>RAM:</b> $2 MB ($1%)")
 -- {{{ CPU usage textbox
 -- Taken from Vicious article on Awesome wiki
 cpuwidget = wibox.widget.textbox()
-vicious.register(cpuwidget, vicious.widgets.cpu, "<b>CPU:</b> $1%")
--- }}}
+vicious.register(cpuwidget, vicious.widgets.cpu, "<b>CPU:</b> $1% ")
 
--- {{{ Thermal info textbox *TEMPORARILY OUT OF ORDER*
---_temptextwidget = wibox.widget.textbox()
---_temptextwidget:set_markup("<b>TEMP:</b> ")
---cputempwidget = wibox.widget.textbox()
---vicious.register(_cputempwidget, vicious.widgets.thermal, "CPU $1°C; ", nil, "thermal_zone1")
---_hddtempwidget = wibox.widget.textbox()
---vicious.register(_hddtempwidget, vicious.widgets.hddtemp, "HDD ${/dev/sda}°C")
---tempwidget = wibox.layout.fixed.horizontal()
---tempwidget:add(_temptextwidget)
---tempwidget:add(_cputempwidget)
---tempwidget:add(_hddtempwidget)
+-- Check CPU temp.  Relies on "cputemp" which is a short script to output CPU temp in a format like "41.2°C"
+cputmpwidget = wibox.widget.textbox()
+awful.widget.watch('cputemp', 2,
+		function(w, s)
+			-- strip spaces and newline from output of cputemp
+			w:set_markup_silently('('..string.gsub(s, "%s*\n", "")..')') 
+		end, cputmpwidget)
 -- }}}
 
 -- {{{ Net usage textbox

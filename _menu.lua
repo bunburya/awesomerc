@@ -32,7 +32,7 @@ officemenu = {
 mediamenu = {
     { "spotify", "spotify" },
     { "vlc", "vlc" },
-    { "mirage (images)", "mirage" }
+    { "mirage (imgs)", "mirage" }
 }
 
 progmenu = {

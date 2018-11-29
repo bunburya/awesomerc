@@ -2,27 +2,33 @@
 
 vicious = require("vicious")
 
--- Volume and power widgets are old and don't use vicious, the rest are newer
--- and do use vicious.
+-- Volume, temperature and power widgets are old and don't use vicious,
+-- the rest are newer and do use vicious.
 -- Volume and power use certain functionality (coloured output depending on
 -- volume/power level) which I can't replicate in vicious yet, so until I find
 -- better docs for vicious they stay that way.
+-- Temperature widget seems to have broken in vicious so I went back to
+-- a sensors-based approach.
 
 -- {{{ Volume textbox
 function get_volume(widget)
     -- Takes a widget which has a text value as an arg. Gets the current
     -- audio volume, formats it and sets it as the text value of the widget.
 	local info = io.popen("amixer -c 1 sget Master"):read("*all")
-	local level, mute_status = string.match(info, "%[(%d+%%)%] %[%-*%d+%.%d+dB%] %[(%a+)%]")
+	local level, sound_status = string.match(info, "%[(%d+%%)%] %[%-*%d+%.%d+dB%] %[(%a+)%]")
 	text = " <b>" .. level .. "</b>"
-    if mute_status == "off" then
+    if sound_status == "off" then
         text = "<span color=\"red\">" .. text .. "</span>"
     end
 	widget:set_markup(text)
 end
 
+function update_volume()
+	get_volume(vol_level)
+end
+
 vol_level = wibox.widget.textbox()
-get_volume(vol_level)
+update_volume()
 vol_icon = wibox.widget.imagebox()
 vol_icon:set_image("/home/alan/.config/awesome/themes/custom/speaker.png")
 vol_widget = {vol_icon, vol_level}
@@ -100,7 +106,7 @@ vicious.register(cpuwidget, vicious.widgets.cpu, "<b>CPU:</b> $1% ")
 
 -- Check CPU temp.  Relies on "cputemp" which is a short script to output CPU temp in a format like "41.2°C"
 cputmpwidget = wibox.widget.textbox()
-awful.widget.watch('cputemp', 2,
+awful.widget.watch('cputemp', 5,
 		function(w, s)
 			-- strip spaces and newline from output of cputemp
 			w:set_markup_silently('('..string.gsub(s, "%s*\n", "")..')') 
@@ -119,5 +125,5 @@ vicious.register(hdwidget, vicious.widgets.fs, "<b>SSD:</b> ${/ used_gb} GB / ${
 
 -- {{{ Pending upgrades textbox
 udwidget = wibox.widget.textbox()
-vicious.register(udwidget, vicious.widgets.pkg, "<b>UPDATES:</b> $1", nil, "Arch")
+vicious.register(udwidget, vicious.widgets.pkg, "<b>UPDATES:</b> $1", nil, "Arch C")
 -- }}}

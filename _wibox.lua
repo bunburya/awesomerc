@@ -145,8 +145,6 @@ awful.screen.connect_for_each_screen(function(s)
     cpuwidget,
     cputmpwidget,
     bar_sep,
-    --tempwidget,
-    --bar_sep,
     netwidget,
     bar_sep,
     hdwidget,

@@ -110,24 +110,25 @@ globalkeys = awful.util.table.join(
     -- Custom keybindings mostly begin here
     
     -- Volume control
-    awful.key({ modkey, }, "XF86AudioLowerVolume", function () awful.spawn("amixer -c 1 sset Master playback 5%-")
-                                                       get_volume(vol_level) end,
+    -- Note:  Specify "-D pulse" here (use PulseAudio to control the sound) because, if we don't,
+    -- muting Master will automatically mute Speaker as well, but Speaker won't automatically unmute
+    -- when we unmute Master.  This is due to a bug / miscommunication between ALSA and PulseAudio.
+    -- Also, call spawn.easy_async rather than just spawn so that update_volume is not called until the
+    -- amixer command completes.  This ensures that the update_volume captures the updated value.
+    awful.key({ modkey, }, "XF86AudioLowerVolume", function () awful.spawn.easy_async("amixer -c 1 -D pulse sset Master playback 5%-",
+                                                       update_volume) end,
                 {description = "decrease volume", group = "volume"}),
-    awful.key({ modkey, }, "XF86AudioRaiseVolume", function () awful.spawn("amixer -c 1 sset Master playback 5%+")
-                                                       get_volume(vol_level) end,
+    awful.key({ modkey, }, "XF86AudioRaiseVolume", function () awful.spawn.easy_async("amixer -c 1 -D pulse sset Master playback 5%+",
+                                                       update_volume) end,
                 {description = "increase volume", group = "volume"}),
-    awful.key({ modkey, }, "XF86AudioMute", function () awful.spawn("amixer -c 1 sset Master playback toggle")
-                                                get_volume(vol_level) end,
+    awful.key({ modkey, }, "XF86AudioMute", function () awful.spawn.easy_async("amixer -c 1 -D pulse sset Master playback toggle",
+                                                update_volume) end,
                 {description = "mute audio", group = "volume"}),
     
-    -- Music control, assumes MPD handles music with MPC installed.
-    -- Also assumes there is a graphical MPD client (eg gmpc) open, to provide notification on song changes.
-    -- NOTE: We won't be using mpd so find a way to make these control spotify
-    --awful.key({ }, "XF86AudioStop", function() awful.util.spawn("mpc stop") end),
-    --awful.key({ }, "XF86AudioPlay", function() awful.util.spawn("mpc toggle") end), 
-    --awful.key({ }, "XF86AudioPrev", function() awful.util.spawn("mpc prev") end),
-    --awful.key({ }, "XF86AudioNext", function() awful.util.spawn("mpc next") end),
-    --awful.key({ modkey,           }, "XF86AudioPlay", function() naughty.notify({ text = io.popen("mpc"):read("*all"), title = "MPD status" }) end),
+    -- Music control, assumes Spotify handles music with playerctl installed.
+    awful.key({ modkey, }, "XF86AudioPlay", function() awful.util.spawn("playerctl --player=spotify play-pause") end), 
+    awful.key({ modkey, }, "XF86AudioPrev", function() awful.util.spawn("playerctl --player=spotify previous") end),
+    awful.key({ modkey, }, "XF86AudioNext", function() awful.util.spawn("playerctl --player=spotify next") end),
     
     -- Brightness control
     awful.key({ modkey, }, "XF86MonBrightnessDown", function () awful.spawn ("xbacklight -dec 10") end,

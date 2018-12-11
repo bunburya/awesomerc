@@ -113,16 +113,11 @@ globalkeys = awful.util.table.join(
     -- Note:  Specify "-D pulse" here (use PulseAudio to control the sound) because, if we don't,
     -- muting Master will automatically mute Speaker as well, but Speaker won't automatically unmute
     -- when we unmute Master.  This is due to a bug / miscommunication between ALSA and PulseAudio.
-    -- Also, call spawn.easy_async rather than just spawn so that update_volume is not called until the
-    -- amixer command completes.  This ensures that the update_volume captures the updated value.
-    awful.key({ modkey, }, "XF86AudioLowerVolume", function () awful.spawn.easy_async("amixer -c 1 -D pulse sset Master playback 5%-",
-                                                       update_volume) end,
+    awful.key({ modkey, }, "XF86AudioLowerVolume", function () awful.spawn("amixer -c 1 -D pulse sset Master playback 5%-") end,
                 {description = "decrease volume", group = "volume"}),
-    awful.key({ modkey, }, "XF86AudioRaiseVolume", function () awful.spawn.easy_async("amixer -c 1 -D pulse sset Master playback 5%+",
-                                                       update_volume) end,
+    awful.key({ modkey, }, "XF86AudioRaiseVolume", function () awful.spawn("amixer -c 1 -D pulse sset Master playback 5%+") end,
                 {description = "increase volume", group = "volume"}),
-    awful.key({ modkey, }, "XF86AudioMute", function () awful.spawn.easy_async("amixer -c 1 -D pulse sset Master playback toggle",
-                                                update_volume) end,
+    awful.key({ modkey, }, "XF86AudioMute", function () awful.spawn("amixer -c 1 -D pulse sset Master playback toggle") end,
                 {description = "mute audio", group = "volume"}),
     
     -- Music control, assumes Spotify handles music with playerctl installed.
@@ -141,7 +136,7 @@ globalkeys = awful.util.table.join(
                 {description = "launch browser", group = "applications"}),
     awful.key({ modkey,           }, "p",     function() awful.spawn(terminal .. " -e python") end,
                 {description = "launch python interpreter", group = "applications"}),
-    awful.key({ modkey,           }, "Prior", function() awful.spawn(fm) end,
+    awful.key({ modkey,           }, "Prior", function() awful.spawn(fm) end, -- Prior = PgUp
                 {description = "launch file manager", group = "applications"}),
     awful.key({ modkey, "Shift"   }, "t",     function() awful.spawn("tilda") end,
                 {description = "launch tilda", group = "applications"}),

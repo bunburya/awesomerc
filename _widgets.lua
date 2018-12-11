@@ -11,27 +11,49 @@ vicious = require("vicious")
 -- a sensors-based approach.
 
 -- {{{ Volume textbox
-function get_volume(widget)
+function update_volume()
     -- Takes a widget which has a text value as an arg. Gets the current
     -- audio volume, formats it and sets it as the text value of the widget.
-	local info = io.popen("amixer -c 1 sget Master"):read("*all")
-	local level, sound_status = string.match(info, "%[(%d+%%)%] %[%-*%d+%.%d+dB%] %[(%a+)%]")
+    -- TODO: Maybe switch from io.popen to some asynchrous function with
+    -- a callback that updates the widget.
+	awful.spawn.easy_async("amixer -c 1 -D pulse sget Master", update_snd_widget)
+end
+
+function update_snd_widget(stdout, stderr, exitreason, exitcode)
+	-- stdout here is the output of calling amixer -c 1 -D pulse sget Master
+
+	-- Calling amixer with -D pulse actually returns separate values for each speaker;
+	-- we just take the value for the first one as they should all be the same 
+	local level, sound_status = string.match(stdout, "%[(%d+%%)%] %[(%a+)%]")
 	text = " <b>" .. level .. "</b>"
     if sound_status == "off" then
         text = "<span color=\"red\">" .. text .. "</span>"
     end
-	widget:set_markup(text)
+	vol_level:set_markup(text)
 end
 
-function update_volume()
-	get_volume(vol_level)
+pactl_status = { in_event = false }
+function handle_pactl_event(stdout)
+	if pactl_status.in_event then
+		if string.find(stdout, "Event 'change' on sink #0") then
+			update_volume(vol_level)
+			pactl_status.in_event = false
+		end
+	else
+		if string.find(stdout, "Event 'new' on client #") then
+			pactl_status.in_event = true
+		end
+	end
 end
+
+awful.spawn.with_line_callback("pactl subscribe", { stdout = handle_pactl_event })	
 
 vol_level = wibox.widget.textbox()
-update_volume()
+update_volume(vol_level)
 vol_icon = wibox.widget.imagebox()
 vol_icon:set_image("/home/alan/.config/awesome/themes/custom/speaker.png")
 vol_widget = {vol_icon, vol_level}
+
 -- }}}
 
 -- {{{ Battery textbox
@@ -78,9 +100,10 @@ batt_update_timer = timer({ timeout = 30 })
 
 batt_update_timer:connect_signal("timeout", update_batt)
 batt_update_timer:start()
+-- Below doesn't seem to work.  Fix it, then we can stop setting the timer.
 pow_interface = "org.freedesktop.UPower.Device"
-acad_change = "type='signal',interface='"..pow_interface.."',path='/org/freedesktop/UPower/devices/line_power_ACAD',member='Changed'"
-batt_change = "type='signal',interface='"..pow_interface.."',path='/org/freedesktop/UPower/devices/battery_BAT1',member='Changed'"
+acad_change = "type='signal',interface='"..pow_interface.."',path='/org/freedesktop/UPower/devices/line_power_AC',member='Changed'"
+batt_change = "type='signal',interface='"..pow_interface.."',path='/org/freedesktop/UPower/devices/battery_BAT0',member='Changed'"
 dbus.add_match("system", acad_change)
 dbus.add_match("system", batt_change)
 dbus.connect_signal(pow_interface, update_batt)
@@ -125,5 +148,5 @@ vicious.register(hdwidget, vicious.widgets.fs, "<b>SSD:</b> ${/ used_gb} GB / ${
 
 -- {{{ Pending upgrades textbox
 udwidget = wibox.widget.textbox()
-vicious.register(udwidget, vicious.widgets.pkg, "<b>UPDATES:</b> $1", nil, "Arch C")
+vicious.register(udwidget, vicious.widgets.pkg, "<b>UPDATES:</b> $1", nil, "Arch")
 -- }}}

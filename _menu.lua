@@ -8,7 +8,8 @@ gamesmenu = {
     { "warzone 2100", "warzone2100" },
     { "wesnoth", "wesnoth" },
     { "morrowind", "openmw"},
-    { "nethack", terminal.." nethack" }
+    { "nethack", terminal.." -e nethack" },
+    { "steam", "steam" }
 }
 
 netmenu = {
@@ -32,7 +33,8 @@ officemenu = {
 mediamenu = {
     { "spotify", "spotify" },
     { "vlc", "vlc" },
-    { "mirage (imgs)", "mirage" }
+    { "mirage (imgs)", "mirage" },
+    { "gimp", "gimp" }
 }
 
 progmenu = {

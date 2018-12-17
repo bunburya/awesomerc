@@ -89,7 +89,7 @@ for file in lfs.dir(wallpaper_dir) do
         table.insert(wallpapers, file)
     end
 end
-
+math.randomseed(os.time())
 theme.wallpaper = wallpaper_dir .. wallpapers[math.random(1, #wallpapers)]
 
 -- You can use your own layout icons like this:

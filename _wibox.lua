@@ -138,17 +138,13 @@ awful.screen.connect_for_each_screen(function(s)
     s.myinfobar.visible = info_vis
     
     s.myinfobar:setup {
-    layout = wibox.layout.fixed.horizontal,
-    space_sep,
+    layout = wibox.layout.ratio.horizontal,
+    spacing_widget = wibox.widget.separator,
+    spacing = 10,
     memwidget,
-    bar_sep,
-    cpuwidget,
-    cputmpwidget,
-    bar_sep,
+    cpu_widget,
     netwidget,
-    bar_sep,
     hdwidget,
-    bar_sep,
     udwidget
     }
     

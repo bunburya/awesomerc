@@ -2,20 +2,18 @@
 
 vicious = require("vicious")
 
--- Volume, temperature and power widgets are old and don't use vicious,
+-- Volume, temperature, power and CPU widgets don't use vicious,
 -- the rest are newer and do use vicious.
 -- Volume and power use certain functionality (coloured output depending on
 -- volume/power level) which I can't replicate in vicious yet, so until I find
 -- better docs for vicious they stay that way.
 -- Temperature widget seems to have broken in vicious so I went back to
 -- a sensors-based approach.
+-- Stopped using vicious for CPU widget so I could integrate the progressbar
+-- widget from awesome 4.3 (TODO: also do this for RAM and SDD widgets).
 
 -- {{{ Volume textbox
 function update_volume()
-    -- Takes a widget which has a text value as an arg. Gets the current
-    -- audio volume, formats it and sets it as the text value of the widget.
-    -- TODO: Maybe switch from io.popen to some asynchrous function with
-    -- a callback that updates the widget.
 	awful.spawn.easy_async("amixer -c 1 -D pulse sget Master", update_snd_widget)
 end
 
@@ -123,17 +121,39 @@ vicious.register(memwidget, vicious.widgets.mem, "<b>RAM:</b> $2 MB ($1%)")
 -- }}}
  
 -- {{{ CPU usage textbox
--- Taken from Vicious article on Awesome wiki
-cpuwidget = wibox.widget.textbox()
-vicious.register(cpuwidget, vicious.widgets.cpu, "<b>CPU:</b> $1% ")
+cpu_use_text = wibox.widget.textbox()
+cpu_temp_text = wibox.widget.textbox()
+cpu_use_bar = wibox.widget.progressbar()
+cpu_use_widget = {
+        cpu_use_bar,
+        {cpu_use_text, cpu_temp_text, layout=wibox.layout.fixed.horizontal},
+        layout = wibox.layout.stack
+        }
+function handle_mpstat_output(stdout)
+    if string.find(stdout, "all") then
+        local idle = tonumber(splitstr(stdout)[12])
+        local busy = 100 - idle
+        cpu_use_text:set_markup(math.floor(busy+0.5).."%")
+        cpu_use_bar:set_value(busy/100)
+    end
+end
 
+awful.spawn.with_line_callback('mpstat 3', {stdout = handle_mpstat_output})
+        
 -- Check CPU temp.  Relies on "cputemp" which is a short script to output CPU temp in a format like "41.2°C"
-cputmpwidget = wibox.widget.textbox()
 awful.widget.watch('cputemp', 5,
 		function(w, s)
 			-- strip spaces and newline from output of cputemp
 			w:set_markup_silently('('..string.gsub(s, "%s*\n", "")..')') 
-		end, cputmpwidget)
+		end, cpu_temp_text)
+
+-- Combine both of these CPU widgets into a single wibox
+cpu_widget = {
+                layout = wibox.layout.fixed.horizontal,
+                wibox.widget.textbox("<b>CPU: </b>"),
+                cpu_use_widget,
+                cpu_temp_widget
+            }
 -- }}}
 
 -- {{{ Net usage textbox

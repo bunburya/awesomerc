@@ -134,7 +134,7 @@ globalkeys = awful.util.table.join(
     -- Common applications
     awful.key({ modkey,           }, "b",     function() awful.spawn(browser) end,
                 {description = "launch browser", group = "applications"}),
-    awful.key({ modkey,           }, "p",     function() awful.spawn(terminal .. " -e python") end,
+    awful.key({ modkey,           }, "p",     function() awful.spawn(python) end,
                 {description = "launch python interpreter", group = "applications"}),
     awful.key({ modkey,           }, "Prior", function() awful.spawn(fm) end, -- Prior = PgUp
                 {description = "launch file manager", group = "applications"}),
@@ -158,10 +158,10 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "s",     function() awful.util.spawn("sshost fs") end,
                 {description = "take screenshot (fullscreen)", group = "applications"}),
     awful.key({ modkey, "Shift"	  }, "m",	  function() awful.util.spawn("spotify") end,
-                {description = "launch spotify", group = "applications"})
+                {description = "launch spotify", group = "applications"}),
     
-    -- Suspend on pressing the button to the right of power button
-    --awful.key({ }, "XF86Launch1", function () awful.util.spawn(suspend) end)
+    -- Toggle screen configurations
+    awful.key({ modkey, "Control" }, "s", function() xrandr.xrandr() end)
     
 
 )

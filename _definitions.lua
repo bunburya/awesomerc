@@ -18,7 +18,7 @@ browser = "firefox"
 terminal = "urxvt"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
-python = terminal .. " -e python"
+python = terminal .. " -e ipython"
 
 -- File manager
 fm = "pcmanfm"

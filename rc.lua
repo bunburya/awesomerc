@@ -13,6 +13,8 @@ beautiful = require("beautiful")
 naughty = require("naughty")
 menubar = require("menubar")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
+-- Script to handle external monitor
+xrandr = require("_xrandr")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to

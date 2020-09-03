@@ -16,8 +16,13 @@ space_sep:set_text(" ")
 
 local layouts = awful.layout.layouts
 
-local my_tag_names = {"general", "email", "music", "prog", "misc"}
-local my_tag_layouts = {layouts[1], layouts[10], layouts[10], layouts[3], layouts[3]}
+-- Main screen (ie, laptop screen)
+local main_tag_names = {"general", "email", "music", "prog", "misc"}
+local main_tag_layouts = {layouts[1], layouts[10], layouts[10], layouts[3], layouts[3]}
+
+-- Each spare screen (eg, external monitor)
+local spare_tag_names = {'spare'}
+local spare_tag_layouts = {layouts[1]}
 
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock()
@@ -80,13 +85,20 @@ end
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
+-- TODO: Handle change of primary screen.
+-- (Related, may need to change xrandr integration to properly set
+-- primary screen.)
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
     
     -- Each screen has its own tag table.
-    awful.tag(my_tag_names, s, my_tag_layouts)
-
+    if s == screen.primary then
+        awful.tag(main_tag_names, s, main_tag_layouts)
+    else
+        awful.tag(spare_tag_names, s, spare_tag_layouts)
+    end
+    
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.

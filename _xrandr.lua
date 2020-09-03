@@ -3,6 +3,9 @@
 local awful     = require("awful")
 local naughty   = require("naughty")
 
+-- unpack moved to table.unpack in lua 5.2
+unpack = table.unpack or unpack
+
 -- A path to a fancy icon
 local icon_path = ""
 

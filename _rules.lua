@@ -46,9 +46,14 @@ awful.rules.rules = {
     { rule = { class = "URxvt" },
       properties = { size_hints_honor = false } },
     { rule = { class = "Thunderbird" },
-      properties = { tag = "email" } },
+      properties = { screen = screen.primary, tag = "email" } },
     { rule = { class = "Spotify" },
-      properties = {screen = 1, tag = "music" } }
+      properties = { screen = screen.primary, tag = "music" } },
+    { rule = { class = "idea" },
+      properties = { screen = screen.primary, tag = "prog" } },
+    { rule = { class = "jetbrains-pycharm-ce" },
+      properties = { screen = screen.primary, tag= "prog" } }
+      
       
       
     -- Add titlebars to normal clients and dialogs

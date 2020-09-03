@@ -33,7 +33,7 @@ end
 pactl_status = { in_event = false }
 function handle_pactl_event(stdout)
 	if pactl_status.in_event then
-		if string.find(stdout, "Event 'change' on sink #0") then
+		if string.find(stdout, "Event 'change' on sink #") then
 			update_volume(vol_level)
 			pactl_status.in_event = false
 		end

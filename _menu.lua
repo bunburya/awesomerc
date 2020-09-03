@@ -27,7 +27,7 @@ officemenu = {
     { "-calc", "libreoffice -calc" },
     { "-impress", "libreoffice -impress" },
     { "-writer", "libreoffice -writer" },
-    { "evince (pdf)", "evince" }
+    { "zathura (pdf)", "zathopen" }
 }
 
 mediamenu = {

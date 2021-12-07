@@ -2,10 +2,6 @@
 
 require("_widgets")
 
-bar_sep = wibox.widget.textbox()
-bar_sep:set_text(" | ")
-space_sep = wibox.widget.textbox()
-space_sep:set_text(" ")
 
 -- TOP BAR
 

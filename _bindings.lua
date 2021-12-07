@@ -7,11 +7,14 @@ root.buttons(awful.util.table.join(
 -- }}}
 
 -- {{{ Key bindings
+
+local hotkeys_popup = require("awful.hotkeys_popup")
+
 globalkeys = awful.util.table.join(
 
     -- Think of a key for this that isn't already taken...
-    --awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
-    --          {description="show help", group="awesome"}),
+    awful.key({ modkey, "Control" }, "s",      hotkeys_popup.show_help,
+              {description="show help", group="awesome"}),
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
               {description = "view previous", group = "tag"}),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext,
@@ -31,7 +34,7 @@ globalkeys = awful.util.table.join(
         end,
         {description = "focus previous by index", group = "client"}
     ),
-    awful.key({ modkey,           }, "w", function () mymainmenu:show() end,
+    awful.key({ "Control",        }, "Menu", function () mymainmenu:show() end,
               {description = "show main menu", group = "awesome"}),
 
     -- Layout manipulation
@@ -110,58 +113,66 @@ globalkeys = awful.util.table.join(
     -- Custom keybindings mostly begin here
     
     -- Volume control
-    -- Note:  Specify "-D pulse" here (use PulseAudio to control the sound) because, if we don't,
-    -- muting Master will automatically mute Speaker as well, but Speaker won't automatically unmute
-    -- when we unmute Master.  This is due to a bug / miscommunication between ALSA and PulseAudio.
-    awful.key({ modkey, }, "XF86AudioLowerVolume", function () awful.spawn("amixer -c 1 -D pulse sset Master playback 5%-") end,
-                {description = "decrease volume", group = "volume"}),
-    awful.key({ modkey, }, "XF86AudioRaiseVolume", function () awful.spawn("amixer -c 1 -D pulse sset Master playback 5%+") end,
-                {description = "increase volume", group = "volume"}),
-    awful.key({ modkey, }, "XF86AudioMute", function () awful.spawn("amixer -c 1 -D pulse sset Master playback toggle") end,
-                {description = "mute audio", group = "volume"}),
+    awful.key({                   }, "XF86AudioLowerVolume", function () awful.spawn("amixer -c 0 sset Master playback 5%-") end,
+                {description = "decrease volume 5%", group = "audio"}),
+    awful.key({                   }, "XF86AudioRaiseVolume", function () awful.spawn("amixer -c 0 sset Master playback 5%+") end,
+                {description = "increase volume 5%", group = "audio"}),
+    awful.key({                   }, "XF86AudioMute", function () awful.spawn("amixer -c 0 sset Master playback toggle") end,
+                {description = "mute audio", group = "audio"}),
     
     -- Music control, assumes Spotify handles music with playerctl installed.
-    awful.key({ modkey, }, "XF86AudioPlay", function() awful.util.spawn("playerctl --player=spotify play-pause") end), 
-    awful.key({ modkey, }, "XF86AudioPrev", function() awful.util.spawn("playerctl --player=spotify previous") end),
-    awful.key({ modkey, }, "XF86AudioNext", function() awful.util.spawn("playerctl --player=spotify next") end),
+    awful.key({ modkey, "Control" }, "p", function() awful.util.spawn("playerctl --player=spotify play-pause") end,
+                {description = "play/pause spotify", group="audio"}), 
+    awful.key({ modkey, "Control" }, ",", function() awful.util.spawn("playerctl --player=spotify previous") end,
+                {description = "play previous song on spotify", group="audio"}),
+    awful.key({ modkey, "Control" }, ".", function() awful.util.spawn("playerctl --player=spotify next") end,
+                {description = "play next song on spotify", group="audio"}),
     
     -- Brightness control
-    awful.key({ modkey, }, "XF86MonBrightnessDown", function () awful.spawn ("xbacklight -dec 10") end,
-                {description = "decrease brightness", group = "brightness"}),
-    awful.key({ modkey, }, "XF86MonBrightnessUp", function () awful.spawn ("xbacklight -inc 10") end,
-                {description = "increase brightness", group = "brightness"}),
+    awful.key({                   }, "XF86MonBrightnessDown", function () awful.spawn ("light -U 10") end,
+                {description = "decrease brightness 10%", group = "screen"}),
+    awful.key({                   }, "XF86MonBrightnessUp", function () awful.spawn ("light -A 10") end,
+                {description = "increase brightness 10%", group = "screen"}),
     
     -- Common applications
     awful.key({ modkey,           }, "b",     function() awful.spawn(browser) end,
                 {description = "launch browser", group = "applications"}),
-    awful.key({ modkey,           }, "p",     function() awful.spawn(python) end,
+    awful.key({                   }, "XF86Calculator",     function() awful.spawn(python) end,
                 {description = "launch python interpreter", group = "applications"}),
     awful.key({ modkey,           }, "Prior", function() awful.spawn(fm) end, -- Prior = PgUp
                 {description = "launch file manager", group = "applications"}),
-    awful.key({ modkey, "Shift"   }, "t",     function() awful.spawn("tilda") end,
-                {description = "launch tilda", group = "applications"}),
     awful.key({ modkey,           }, "g",     function() awful.spawn("geany") end,
                 {description = "launch geany", group = "applications"}),
-    awful.key({ modkey, "Shift"   }, "w",     function() awful.spawn("libreoffice -writer") end,
+    awful.key({ modkey,           }, "w",     function() awful.spawn("libreoffice -writer") end,
                 {description = "launch libreoffice writer", group = "applications"}),
+    
+    -- System monitoring / maintenance
     awful.key({ modkey,           }, "i",     function()
                                                   info_vis = not info_vis
                                                   awful.screen.connect_for_each_screen(function (s)
                                                       s.myinfobar.visible = info_vis end)
                                               end,
                 {description = "toggle infobar", group = "system"}),
-    awful.key({ modkey,           }, "u",     function() awful.util.spawn(terminal .. " -e trizen -Syu --noconfirm && read || read") end,
+    awful.key({ modkey,           }, "u",     function() awful.util.spawn(terminal .. " -e trizen -Syu") end,
                 {description = "update", group = "system"}),
-    -- sleep() is required in this next line to give awesome time to hand control of the keyboard over to scrot
-    awful.key({ modkey,           }, "s",     function() sleep(0.5); awful.util.spawn("sshost") end,
-                {description = "take screenshot", group = "applications"}),
-    awful.key({ modkey, "Shift"   }, "s",     function() awful.util.spawn("sshost fs") end,
-                {description = "take screenshot (fullscreen)", group = "applications"}),
-    awful.key({ modkey, "Shift"	  }, "m",	  function() awful.util.spawn("spotify") end,
-                {description = "launch spotify", group = "applications"}),
+                
+    -- Screenshots
+    -- sleep() is required in these functions to give awesome time to hand control of the keyboard over to scrot
+    awful.key({                   }, "Print",     function() sleep(0.5); awful.util.spawn("screenshot") end,
+                {description = "take screenshot and save locally (selection)", group = "screen"}),
+    awful.key({ "Shift",          }, "Print",     function() sleep(0.5); awful.util.spawn("screenshot fs") end,
+                {description = "take screenshot and save locally (fullscreen)", group = "screen"}),
+    awful.key({ modkey,           }, "Print",     function() sleep(0.5); awful.util.spawn("screenshot cloud") end,
+                {description = "take screenshot and upload to remote server (selection)", group = "screen"}),
+    awful.key({ modkey, "Shift"   }, "Print",     function() awful.util.spawn("screenshot cloud fs") end,
+                {description = "take screenshot and upload to remote server (fullscreen)", group = "screen"}),
     
     -- Toggle screen configurations
-    awful.key({ modkey, "Control" }, "s", function() xrandr.xrandr() end)
+    -- Note: Dell Latitude 5520 has a screen switch button (at F8 key) but this
+    -- seems to be interpreted by system as modkey+p.
+    -- see https://bbs.archlinux.org/viewtopic.php?id=188599
+    awful.key({ modkey,           }, "p", function() xrandr.xrandr() end,
+                {description = "Switch video mode", group="screen"})
     
 
 )

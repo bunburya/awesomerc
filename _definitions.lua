@@ -9,7 +9,9 @@ wallpaper_dir = ('/home/alan/pics/backgrounds/')
 -- Shutdown, suspend and restart
 shutdown = "shutdown -h now"
 reboot = "reboot"
+reboot_bios = "systemctl reboot --firmware-setup"
 suspend = "pm-suspend"
+
 
 -- Browser
 browser = "firefox"

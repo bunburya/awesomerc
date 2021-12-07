@@ -2,6 +2,13 @@
 
 vicious = require("vicious")
 
+-- Separators
+
+bar_sep = wibox.widget.textbox()
+bar_sep:set_text(" | ")
+space_sep = wibox.widget.textbox()
+space_sep:set_text(" ")
+
 -- Volume, temperature, power and CPU widgets don't use vicious,
 -- the rest are newer and do use vicious.
 -- Volume and power use certain functionality (coloured output depending on
@@ -14,15 +21,14 @@ vicious = require("vicious")
 
 -- {{{ Volume textbox
 function update_volume()
-	awful.spawn.easy_async("amixer -c 1 -D pulse sget Master", update_snd_widget)
+	--awful.spawn.easy_async("amixer -c 1 -D pulse sget Master", update_snd_widget)
+	awful.spawn.easy_async("amixer -c 0 sget Master", update_snd_widget)
 end
 
 function update_snd_widget(stdout, stderr, exitreason, exitcode)
-	-- stdout here is the output of calling amixer -c 1 -D pulse sget Master
+	-- stdout here is the output of calling amixer -c 0 sget Master
 
-	-- Calling amixer with -D pulse actually returns separate values for each speaker;
-	-- we just take the value for the first one as they should all be the same 
-	local level, sound_status = string.match(stdout, "%[(%d+%%)%] %[(%a+)%]")
+	local level, sound_status = string.match(stdout, "%[(%d+%%)%] %[%-?%d+%.%d%ddB%] %[(%a+)%]")
 	text = " <b>" .. level .. "</b>"
     if sound_status == "off" then
         text = "<span color=\"red\">" .. text .. "</span>"
@@ -30,21 +36,11 @@ function update_snd_widget(stdout, stderr, exitreason, exitcode)
 	vol_level:set_markup(text)
 end
 
-pactl_status = { in_event = false }
-function handle_pactl_event(stdout)
-	if pactl_status.in_event then
-		if string.find(stdout, "Event 'change' on sink #") then
-			update_volume(vol_level)
-			pactl_status.in_event = false
-		end
-	else
-		if string.find(stdout, "Event 'new' on client #") then
-			pactl_status.in_event = true
-		end
-	end
+function handle_alsa_event(stdout)
+    update_volume(vol_level)
 end
 
-awful.spawn.with_line_callback("pactl subscribe", { stdout = handle_pactl_event })	
+awful.spawn.with_line_callback("unbuffer alsactl monitor", { stdout = handle_alsa_event })	
 
 vol_level = wibox.widget.textbox()
 update_volume(vol_level)
@@ -98,7 +94,7 @@ batt_update_timer = timer({ timeout = 30 })
 
 batt_update_timer:connect_signal("timeout", update_batt)
 batt_update_timer:start()
--- Below doesn't seem to work.  Fix it, then we can stop setting the timer.
+-- FIXME: Below doesn't seem to work.  Fix it, then we can stop setting the timer.
 pow_interface = "org.freedesktop.UPower.Device"
 acad_change = "type='signal',interface='"..pow_interface.."',path='/org/freedesktop/UPower/devices/line_power_AC',member='Changed'"
 batt_change = "type='signal',interface='"..pow_interface.."',path='/org/freedesktop/UPower/devices/battery_BAT0',member='Changed'"
@@ -123,18 +119,19 @@ vicious.register(memwidget, vicious.widgets.mem, "<b>RAM:</b> $2 MB ($1%)")
 -- {{{ CPU usage textbox
 cpu_use_text = wibox.widget.textbox()
 cpu_temp_text = wibox.widget.textbox()
-cpu_use_bar = wibox.widget.progressbar()
-cpu_use_widget = {
-        cpu_use_bar,
-        {cpu_use_text, cpu_temp_text, layout=wibox.layout.fixed.horizontal},
-        layout = wibox.layout.stack
-        }
+--cpu_use_bar = wibox.widget.progressbar()
+--cpu_use_widget = {
+--        cpu_use_bar,
+--        {cpu_use_text, cpu_temp_text, layout=wibox.layout.fixed.horizontal},
+--        layout = wibox.layout.stack
+--        }
+
 function handle_mpstat_output(stdout)
     if string.find(stdout, "all") then
         local idle = tonumber(splitstr(stdout)[12])
         local busy = 100 - idle
         cpu_use_text:set_markup(math.floor(busy+0.5).."%")
-        cpu_use_bar:set_value(busy/100)
+        --cpu_use_bar:set_value(busy/100)
     end
 end
 
@@ -149,16 +146,17 @@ awful.widget.watch('cputemp', 5,
 
 -- Combine both of these CPU widgets into a single wibox
 cpu_widget = {
-                layout = wibox.layout.fixed.horizontal,
-                wibox.widget.textbox("<b>CPU: </b>"),
-                cpu_use_widget,
-                cpu_temp_widget
-            }
+    wibox.widget.textbox("<b>CPU: </b>"),
+    cpu_use_text,
+    space_sep,
+    cpu_temp_text,
+    layout=wibox.layout.fixed.horizontal
+}
 -- }}}
 
 -- {{{ Net usage textbox
 netwidget = wibox.widget.textbox()
-vicious.register(netwidget, vicious.widgets.net, "<b>NET:</b> ${wlp6s0 up_kb} KB ↑ ${wlp6s0 down_kb} KB ↓")
+vicious.register(netwidget, vicious.widgets.net, "<b>NET:</b> ${wlan0 up_kb} KB ↑ ${wlan0 down_kb} KB ↓")
 -- }}}
 
 -- {{{ Hard drive usage textbox

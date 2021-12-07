@@ -1,4 +1,4 @@
---- Separating Multiple Monitor functions as a separeted module (taken from awesome wiki)
+--- Separating multiple monitor functions as a separated module (taken from awesome wiki)
 
 local awful     = require("awful")
 local naughty   = require("naughty")

@@ -13,12 +13,10 @@ gamesmenu = {
 }
 
 netmenu = {
-    { "wicd", "wicd-client" },
     { "firefox", "firefox" },
     { "surf", "surf" },
     { "elinks", terminal.." -e elinks" },
     { "thunderbird", "thunderbird" },
-    { "chat", terminal.." -e irssi" }
 }
 
 officemenu = {
@@ -38,7 +36,6 @@ mediamenu = {
 }
 
 progmenu = {
-    { "cmake", "cmake-gui" },
     { "geany", "geany" },
     { "vim", terminal .. " -e vim" },
     { "python", terminal .. " -e python" }
@@ -53,6 +50,7 @@ sysmenu = {
     { "restart", awesome.restart },
     { "logout", awesome.quit },
     { "reboot", reboot },
+    { "reboot (bios)", reboot_bios },
     { "suspend", suspend },
     { "shutdown", shutdown }
 }

@@ -1,3 +1,13 @@
+-- This is my AwesomeWM configuration. Other than custom keybindings, etc,
+-- the main difference to the standard configuration is that I have split it
+-- out into different files for ease of maintenance. This file mostly just
+-- imports the other files.
+
+-- If LuaRocks is installed, make sure that packages installed through it are
+-- found (e.g. lgi). If LuaRocks is not installed, do nothing.
+pcall(require, "luarocks.loader")
+
+
 -- Some of the below imports cannot be local, as they are required
 -- by the modules we import
 
@@ -71,8 +81,6 @@ require("_menu")
 
 -- }}}
 
--- Keyboard map indicator and switcher
-mykeyboardlayout = awful.widget.keyboardlayout()
 
 -- {{{ Wibar
 

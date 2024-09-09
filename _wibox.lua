@@ -131,8 +131,8 @@ awful.screen.connect_for_each_screen(function(s)
             vol_icon,
             vol_level,
             space_sep,
-            batt_icon,
-            batt_level,
+            bat_icon,
+            bat_level,
             mytextclock,
             s.mylayoutbox,
         },
@@ -153,8 +153,12 @@ awful.screen.connect_for_each_screen(function(s)
     cpu_widget,
     netwidget,
     hdwidget,
-    udwidget
+    udwidget,
+    np_container
     }
+    
+    s.myinfobar.widget:set_ratio(4, 0.2)
+
     
 end)
 

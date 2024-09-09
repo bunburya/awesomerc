@@ -110,23 +110,27 @@ globalkeys = awful.util.table.join(
     --awful.key({ modkey }, "p", function() menubar.show() end,
     --          {description = "show the menubar", group = "launcher"}),
     
+    
     -- Custom keybindings mostly begin here
     
     -- Volume control
-    awful.key({                   }, "XF86AudioLowerVolume", function () awful.spawn("amixer -c 0 sset Master playback 5%-") end,
+    -- NOTE: When using PulseAudio, need to use the pactl command to toggle mute, as unmuting
+    -- doesn't work properly when using amixer. But changing volume with amixer seems to work fine
+    -- and is more responsive than the pactl equivalent.
+    awful.key({                   }, "XF86AudioLowerVolume", function () awful.spawn("amixer -D pulse -c 0 sset Master playback 5%-") end,
                 {description = "decrease volume 5%", group = "audio"}),
-    awful.key({                   }, "XF86AudioRaiseVolume", function () awful.spawn("amixer -c 0 sset Master playback 5%+") end,
+    awful.key({                   }, "XF86AudioRaiseVolume", function () awful.spawn("amixer -D pulse -c 0 sset Master playback 5%+") end,
                 {description = "increase volume 5%", group = "audio"}),
-    awful.key({                   }, "XF86AudioMute", function () awful.spawn("amixer -c 0 sset Master playback toggle") end,
+    awful.key({                   }, "XF86AudioMute", function () awful.spawn("pactl set-sink-mute 0 toggle") end,
                 {description = "mute audio", group = "audio"}),
     
     -- Music control, assumes Spotify handles music with playerctl installed.
-    awful.key({ modkey, "Control" }, "p", function() awful.util.spawn("playerctl --player=spotify play-pause") end,
-                {description = "play/pause spotify", group="audio"}), 
-    awful.key({ modkey, "Control" }, ",", function() awful.util.spawn("playerctl --player=spotify previous") end,
-                {description = "play previous song on spotify", group="audio"}),
-    awful.key({ modkey, "Control" }, ".", function() awful.util.spawn("playerctl --player=spotify next") end,
-                {description = "play next song on spotify", group="audio"}),
+    awful.key({ modkey, "Control" }, "p", function() awful.util.spawn("playerctl play-pause") end,
+                {description = "play/pause music", group="audio"}), 
+    awful.key({ modkey, "Control" }, ",", function() awful.util.spawn("playerctl previous") end,
+                {description = "play previous song", group="audio"}),
+    awful.key({ modkey, "Control" }, ".", function() awful.util.spawn("playerctl next") end,
+                {description = "play next song", group="audio"}),
     
     -- Brightness control
     awful.key({                   }, "XF86MonBrightnessDown", function () awful.spawn ("light -U 10") end,
@@ -145,6 +149,11 @@ globalkeys = awful.util.table.join(
                 {description = "launch geany", group = "applications"}),
     awful.key({ modkey,           }, "w",     function() awful.spawn("libreoffice -writer") end,
                 {description = "launch libreoffice writer", group = "applications"}),
+    awful.key({ modkey, "Control" }, "v", function() awful.util.spawn("mullvad") end,
+                {description = "toggle wireguard (choose interface)", group = "network"}),
+                
+    awful.key({ modkey,           }, "v", function() awful.util.spawn("mullvad default") end,
+                {description = "toggle wireguard (default interface)", group = "network"}),
     
     -- System monitoring / maintenance
     awful.key({ modkey,           }, "i",     function()

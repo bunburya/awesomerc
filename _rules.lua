@@ -45,14 +45,14 @@ awful.rules.rules = {
       }, properties = { floating = true }},
     { rule = { class = "URxvt" },
       properties = { size_hints_honor = false } },
-    { rule = { class = "Thunderbird" },
+    { rule = { class = "thunderbird" },
       properties = { screen = screen.primary, tag = "email" } },
     { rule = { class = "Spotify" },
       properties = { screen = screen.primary, tag = "music" } },
-    { rule = { class = "idea" },
-      properties = { screen = screen.primary, tag = "prog" } },
-    { rule = { class = "jetbrains-pycharm-ce" },
-      properties = { screen = screen.primary, tag= "prog" } }
+    { rule_any = { class = { "jetbrains-pycharm-ce", "jetbrains-studio", "jetbrains-idea-ce" } },
+      properties = { screen = screen.primary, tag= "prog" } },
+    { rule = { class = "Steam" },
+      properties = { screen = screen.primary, tag = "general" } }
       
       
       

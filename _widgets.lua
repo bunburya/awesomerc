@@ -57,52 +57,67 @@ vol_widget = {vol_icon, vol_level}
 -- Color coding and notifications alert user if battery is reaching
 -- very low levels.
 -- work in progress tbh
-function get_batt(widget)
-	local info = io.popen("acpi -b"):read("*all")
-	if info == ""
-	then
+bat_status = {
+    present = nil,
+    dis_charge = nil,
+    level = nil
+}
+
+-- Set the initial status
+local init_bat_status = io.popen("acpi -b"):read("*all")
+if init_bat_status == "" then
+    bat_status.present = false
+else
+    bat_status.present = true
+    local dis_charge, level = string.match(init_bat_status, "(%a+), (%d+)%%")
+    if dis_charge == "Full" then
+        bat_status.dis_charge = "FullyCharged"
+    else
+        bat_status.dis_charge = dis_charge
+    end
+    bat_status.level = tonumber(level)
+end
+
+function update_bat_widget(widget, status)
+	if not status.present then
 		text = " <b>removed</b> "
-	else
-		local dis_charge, level = string.match(info, "(%a+), (%d+)%%")
-		local lev_num = tonumber(level)
-		
-		if dis_charge == "Discharging" then
-			if lev_num <= 10 then
-				text = ' <b><span color="red">' .. level .. '%-</span></b> '
-				naughty.notify({ text = "Battery is running low.\n" .. level .. "% remaining.", title = "Low battery" })
+	else		
+		if status.dis_charge == "Discharging" then
+			if status.level <= 10 then
+				text = ' <b><span color="red">' .. status.level .. '%-</span></b> '
+				naughty.notify({ text = "Battery is running low.\n" .. status.level .. "% remaining.", title = "Low battery" })
 			else
-				text = " <b>" .. level .. "%-</b> "
+				text = " <b>" .. status.level .. "%-</b> "
 			end
-		elseif dis_charge == "Charging" then
-			text = " <b>" .. level .. "%+</b> "
-		elseif dis_charge == "Full" then     -- Battery is full, and AC plugged in.
-			text = ' <b><span color="green">' .. level .. '%</span></b> '
+		elseif status.dis_charge == "Charging" then
+			text = " <b>" .. status.level .. "%+</b> "
+		elseif status.dis_charge == "FullyCharged" then
+			text = ' <b><span color="green">' .. status.level .. '%</span></b> '
 		end
 	end
 	widget:set_markup(text)
 end
 
+upmon_cmd = "/usr/bin/upmon -p /org/freedesktop/UPower/devices/battery_BAT0 Percentage,State"
 
-batt_icon = wibox.widget.imagebox()
-batt_icon:set_image("/home/alan/.config/awesome/themes/custom/battery.png")
-batt_level = wibox.widget.textbox()
-function update_batt()
-    get_batt(batt_level)
-end
-update_batt()
-batt_update_timer = timer({ timeout = 30 })
+awful.spawn.with_line_callback(upmon_cmd, { stdout = function(line) 
+    if not bat_status.present then bat_status = true end
+    local dis_charge = string.match(line, "State=(%a+)")
+    if dis_charge ~= nil then bat_status.dis_charge = dis_charge end
+    local level = string.match(line, "Percentage=(%d+)")
+    if level ~= nil then bat_status.level = tonumber(level) end
+    update_bat_widget(bat_level, bat_status)
+end })
 
-batt_update_timer:connect_signal("timeout", update_batt)
-batt_update_timer:start()
--- FIXME: Below doesn't seem to work.  Fix it, then we can stop setting the timer.
-pow_interface = "org.freedesktop.UPower.Device"
-acad_change = "type='signal',interface='"..pow_interface.."',path='/org/freedesktop/UPower/devices/line_power_AC',member='Changed'"
-batt_change = "type='signal',interface='"..pow_interface.."',path='/org/freedesktop/UPower/devices/battery_BAT0',member='Changed'"
-dbus.add_match("system", acad_change)
-dbus.add_match("system", batt_change)
-dbus.connect_signal(pow_interface, update_batt)
 
-batt_widget = {batt_icon, batt_level}
+bat_icon = wibox.widget.imagebox()
+bat_icon:set_image("/home/alan/.config/awesome/themes/custom/battery.png")
+bat_level = wibox.widget.textbox()
+
+
+bat_widget = {bat_icon, bat_level}
+update_bat_widget(bat_level, bat_status)
+
 -- }}}
 
 -- {{{ RAM usage textbox
@@ -161,10 +176,42 @@ vicious.register(netwidget, vicious.widgets.net, "<b>NET:</b> ${wlan0 up_kb} KB 
 
 -- {{{ Hard drive usage textbox
 hdwidget = wibox.widget.textbox()
-vicious.register(hdwidget, vicious.widgets.fs, "<b>SSD:</b> ${/ used_gb} GB / ${/ size_gb} GB")
+vicious.register(hdwidget, vicious.widgets.fs, "<b>nvme0:</b> ${/ used_gb} GB / ${/ size_gb} GB <b>nvme1:</b> ${/mnt/storage used_gb} GB / ${/mnt/storage size_gb} GB")
 -- }}}
 
 -- {{{ Pending upgrades textbox
 udwidget = wibox.widget.textbox()
-vicious.register(udwidget, vicious.widgets.pkg, "<b>UPDATES:</b> $1", nil, "Arch")
+vicious.register(udwidget, vicious.widgets.pkg, "<b>UPDATES:</b> $1", 300, "Arch")
+-- }}}
+
+-- {{{ Now Playing textbox
+
+np_cmd = "playerctl --format '{{status}} {{artist}} - {{title}}' -F metadata"
+
+function get_now_playing(output_str)
+    -- Parse output of playerctl and get message to display
+    i, _ = string.find(output_str, ' ')
+    status = string.sub(output_str, 0, i-1)
+    if status == "Paused" or status == "Stopped" then return "N/A" end
+    return ' ' .. string.sub(output_str, i+1) .. ' '
+end
+
+np_label = wibox.widget.textbox("<b>PLAYING:</b> ")
+np_textbox = wibox.widget.textbox("N/A")
+
+awful.spawn.with_line_callback(np_cmd, {
+    stdout = function(line)
+        np_textbox:set_markup(get_now_playing(line))
+        
+    end
+})
+
+np_scrollbox = wibox.container.scroll.horizontal(np_textbox)
+
+np_container = {
+    layout = wibox.layout.fixed.horizontal,
+    np_label,
+    np_scrollbox
+}
+
 -- }}}

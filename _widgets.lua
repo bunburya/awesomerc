@@ -1,6 +1,7 @@
 -- Define custom widgets and behaviour relating to them.
 
 vicious = require("vicious")
+require("_helpers")
 
 -- Separators
 
@@ -8,16 +9,6 @@ bar_sep = wibox.widget.textbox()
 bar_sep:set_text(" | ")
 space_sep = wibox.widget.textbox()
 space_sep:set_text(" ")
-
--- Volume, temperature, power and CPU widgets don't use vicious,
--- the rest are newer and do use vicious.
--- Volume and power use certain functionality (coloured output depending on
--- volume/power level) which I can't replicate in vicious yet, so until I find
--- better docs for vicious they stay that way.
--- Temperature widget seems to have broken in vicious so I went back to
--- a sensors-based approach.
--- Stopped using vicious for CPU widget so I could integrate the progressbar
--- widget from awesome 4.3 (TODO: also do this for RAM and SDD widgets).
 
 -- {{{ Volume textbox
 function update_volume()
@@ -121,13 +112,12 @@ update_bat_widget(bat_level, bat_status)
 -- }}}
 
 -- {{{ RAM usage textbox
--- Taken from Vicious article on Awesome wiki
 
--- Initialize widget
-memwidget = wibox.widget.textbox()
--- Register widget
--- $1 = percentage usage, $2 = actual usage, $3 = total available
-vicious.register(memwidget, vicious.widgets.mem, "<b>RAM:</b> $2 MB ($1%)")
+memwidget = awful.widget.watch("free --bytes", 2, function(widget, stdout)
+    local used, total = parse_free(stdout)
+    pct = math.floor((used / total) * 100)
+    widget:set_markup(string.format("<b>RAM:</b> %s (%d%%)", format_bytes(used), pct))
+end)
 
 -- }}}
  
@@ -175,13 +165,25 @@ vicious.register(netwidget, vicious.widgets.net, "<b>NET:</b> ${wlan0 up_kb} KB 
 -- }}}
 
 -- {{{ Hard drive usage textbox
-hdwidget = wibox.widget.textbox()
-vicious.register(hdwidget, vicious.widgets.fs, "<b>nvme0:</b> ${/ used_gb} GB / ${/ size_gb} GB <b>nvme1:</b> ${/mnt/storage used_gb} GB / ${/mnt/storage size_gb} GB")
+hdwidget = awful.widget.watch("bash -c \"df | grep '/dev/nvme1n1p2\\|/dev/nvme0n1'\"", 5, function(widget, stdout)
+    stats = parse_filtered_df(stdout)
+    main = stats["/dev/nvme1n1p2"]
+    main_total = main[1] / 1000000
+    main_used = main[2] / 1000000
+    main_pct = main[3]
+    storage = stats["/dev/nvme0n1"]
+    storage_total = storage[1] / 1000000
+    storage_used = storage[2] / 1000000
+    storage_pct = storage[3]
+    --widget:set_markup(stdout)
+    widget:set_markup(string.format("<b>main:</b> %.1f / %.1f GB <b>storage:</b> %.1f / %.1f GB", main_used, main_total, storage_used, storage_total))
+end)
 -- }}}
 
 -- {{{ Pending upgrades textbox
-udwidget = wibox.widget.textbox()
-vicious.register(udwidget, vicious.widgets.pkg, "<b>UPDATES:</b> $1", 300, "Arch")
+udwidget = awful.widget.watch("bash -c \"trizen -Qu | wc -l\"", 300, function(widget, stdout)
+    widget:set_markup(string.format("<b>UPDATES:</b> %d", stdout))
+end)
 -- }}}
 
 -- {{{ Now Playing textbox

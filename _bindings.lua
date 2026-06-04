@@ -167,13 +167,13 @@ globalkeys = awful.util.table.join(
                 
     -- Screenshots
     -- sleep() is required in these functions to give awesome time to hand control of the keyboard over to scrot
-    awful.key({                   }, "Print",     function() sleep(0.5); awful.util.spawn("screenshot") end,
+    awful.key({                   }, "Print",     function() sleep(0.5); awful.util.spawn("sshost-xorg") end,
                 {description = "take screenshot and save locally (selection)", group = "screen"}),
-    awful.key({ "Shift",          }, "Print",     function() sleep(0.5); awful.util.spawn("screenshot fs") end,
+    awful.key({ "Shift",          }, "Print",     function() sleep(0.5); awful.util.spawn("sshost-xorg fs") end,
                 {description = "take screenshot and save locally (fullscreen)", group = "screen"}),
-    awful.key({ modkey,           }, "Print",     function() sleep(0.5); awful.util.spawn("screenshot cloud") end,
+    awful.key({ modkey,           }, "Print",     function() sleep(0.5); awful.util.spawn("sshost-xorg cloud") end,
                 {description = "take screenshot and upload to remote server (selection)", group = "screen"}),
-    awful.key({ modkey, "Shift"   }, "Print",     function() awful.util.spawn("screenshot cloud fs") end,
+    awful.key({ modkey, "Shift"   }, "Print",     function() awful.util.spawn("sshost-xorg cloud fs") end,
                 {description = "take screenshot and upload to remote server (fullscreen)", group = "screen"}),
     
     -- Toggle screen configurations

@@ -17,7 +17,7 @@ suspend = "pm-suspend"
 browser = "firefox"
 
 -- This is used later as the default terminal and editor to run.
-terminal = "urxvt"
+terminal = "kitty"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 python = terminal .. " -e ipython"

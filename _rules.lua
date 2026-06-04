@@ -45,7 +45,7 @@ awful.rules.rules = {
       }, properties = { floating = true }},
     { rule = { class = "URxvt" },
       properties = { size_hints_honor = false } },
-    { rule = { class = "thunderbird" },
+    { rule = { class = "org.mozilla.Thunderbird" },
       properties = { screen = screen.primary, tag = "email" } },
     { rule = { class = "Spotify" },
       properties = { screen = screen.primary, tag = "music" } },

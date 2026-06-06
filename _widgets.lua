@@ -189,7 +189,7 @@ end)
 -- {{{ Hard drive usage textbox
 local mountpoints = { ["/"] = "main", ["/mnt/storage"] = "storage" }
 hdwidget = awful.widget.watch("df", 5, function(widget, stdout)
-    local stats = parse_filtered_df(stdout, mountpoints)
+    local stats = parse_df(stdout, mountpoints)
     local main = stats["main"]
     local main_total = main[1] / 1000000
     local main_used = main[2] / 1000000

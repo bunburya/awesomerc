@@ -33,7 +33,7 @@ end
 
 
 function parse_filtered_df(output)
-    -- Parse the output of `df | grep "<fs1name>|<fs2name>"` (ie, output that has been filtered to
+    -- Parse the output of `df | grep "<mountpoint1>$|<mountpoint2>$"` (ie, output that has been filtered to
     -- only the relevant filesystems). Returns a {filesystem, used, total, pct} table for each
     -- given filesystem. Values are returned in KB.
     
@@ -44,9 +44,22 @@ function parse_filtered_df(output)
     local stats = {}
     
     for line in output:gmatch("[^\r\n]+") do
-        local _, _, fs, total, used, pct = string.find(line, "^(%S+)%s+(%d+)%s+(%d+)%s+%d+%s+(%d+%%)")
-        stats[fs] = {total, used, pct}
+        local _, _, total, used, pct, mp = string.find(line, "^%S+%s+(%d+)%s+(%d+)%s+%d+%s+(%d+%%)%s+(%S+)")
+        stats[mp] = {tonumber(total), tonumber(used), pct}
     
     end
     return stats
+end
+
+function parse_net_dev(output)
+    -- Parse the output of `grep <interface> /proc/net/dev` (ie, output that has been filtered
+    -- to only the relevant interface, such as wlan0). Returns (down_bytes, up_bytes).
+    -- Output looks something like:
+    --   wlan0: 646008124  575652    0    0    0     0          0         0 51104011  328400    0    8    0     0       0          0
+
+    local _, _, down, up = string.find(
+        output,
+        ":%s+(%d+)%s+%d+%s+%d+%s+%d+%s+%d+%s+%d+%s+%d+%s+%d+%s+(%d+)"
+    )
+    return tonumber(down), tonumber(up)
 end

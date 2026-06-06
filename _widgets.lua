@@ -1,6 +1,5 @@
 -- Define custom widgets and behaviour relating to them.
 
-vicious = require("vicious")
 require("_helpers")
 
 -- Separators
@@ -12,11 +11,10 @@ space_sep:set_text(" ")
 
 -- {{{ Volume textbox
 function update_volume()
-	--awful.spawn.easy_async("amixer -c 1 -D pulse sget Master", update_snd_widget)
-	awful.spawn.easy_async("amixer -c 0 sget Master", update_snd_widget)
+	awful.spawn.easy_async("amixer -c 0 sget Master", update_vol_widget)
 end
 
-function update_snd_widget(stdout, stderr, exitreason, exitcode)
+function update_vol_widget(stdout, stderr, exitreason, exitcode)
 	-- stdout here is the output of calling amixer -c 0 sget Master
 
 	local level, sound_status = string.match(stdout, "%[(%d+%%)%] %[%-?%d+%.%d%ddB%] %[(%a+)%]")
@@ -76,7 +74,10 @@ function update_bat_widget(widget, status)
 		if status.dis_charge == "Discharging" then
 			if status.level <= 10 then
 				text = ' <b><span color="red">' .. status.level .. '%-</span></b> '
-				naughty.notify({ text = "Battery is running low.\n" .. status.level .. "% remaining.", title = "Low battery" })
+				naughty.notify({ 
+                    text = "Battery is running low.\n" .. status.level .. "% remaining.",
+                    title = "Low battery" 
+                })
 			else
 				text = " <b>" .. status.level .. "%-</b> "
 			end
@@ -89,7 +90,7 @@ function update_bat_widget(widget, status)
 	widget:set_markup(text)
 end
 
-upmon_cmd = "/usr/bin/upmon -p /org/freedesktop/UPower/devices/battery_BAT0 Percentage,State"
+local upmon_cmd = "/usr/bin/upmon -p /org/freedesktop/UPower/devices/battery_BAT0 Percentage,State"
 
 awful.spawn.with_line_callback(upmon_cmd, { stdout = function(line) 
     if not bat_status.present then bat_status = true end
@@ -124,29 +125,22 @@ end)
 -- {{{ CPU usage textbox
 cpu_use_text = wibox.widget.textbox()
 cpu_temp_text = wibox.widget.textbox()
---cpu_use_bar = wibox.widget.progressbar()
---cpu_use_widget = {
---        cpu_use_bar,
---        {cpu_use_text, cpu_temp_text, layout=wibox.layout.fixed.horizontal},
---        layout = wibox.layout.stack
---        }
 
 function handle_mpstat_output(stdout)
     if string.find(stdout, "all") then
         local idle = tonumber(splitstr(stdout)[12])
         local busy = 100 - idle
         cpu_use_text:set_markup(math.floor(busy+0.5).."%")
-        --cpu_use_bar:set_value(busy/100)
     end
 end
 
 awful.spawn.with_line_callback('mpstat 3', {stdout = handle_mpstat_output})
         
--- Check CPU temp.  Relies on "cputemp" which is a short script to output CPU temp in a format like "41.2°C"
-awful.widget.watch('cputemp', 5,
+-- Check CPU temp.  The bash outputs CPU temp in a format like "41.2°C"
+awful.widget.watch('bash -c "sensors | grep \\"Package id 0:\\" | awk -F \' \' \'{print $4}\' | cut -c 2-"', 5,
 		function(w, s)
 			-- strip spaces and newline from output of cputemp
-			w:set_markup_silently('('..string.gsub(s, "%s*\n", "")..')') 
+			w:set_markup('('..string.gsub(s, "%s*\n", "")..')') 
 		end, cpu_temp_text)
 
 -- Combine both of these CPU widgets into a single wibox
@@ -160,22 +154,30 @@ cpu_widget = {
 -- }}}
 
 -- {{{ Net usage textbox
-netwidget = wibox.widget.textbox()
-vicious.register(netwidget, vicious.widgets.net, "<b>NET:</b> ${wlan0 up_kb} KB ↑ ${wlan0 down_kb} KB ↓")
+local netstats = {up = 0, down = 0}
+netwidget = awful.widget.watch("grep wlan0 /proc/net/dev", 2, function(widget, stdout)
+    i = i + 1
+    local down, up = parse_net_dev(stdout)
+    -- divide by two to get per-second value
+    local d_down = math.floor((down - netstats["down"]) / 2)
+    local d_up = math.floor((up - netstats["up"]) / 2)
+    netstats["down"] = down
+    netstats["up"] = up
+    down_hr = format_bytes(d_down)
+    up_hr = format_bytes(d_up)
+    widget:set_markup(string.format("<b>NET:</b> %s ↑ %s ↓", up_hr, down_hr))
+end)
 -- }}}
 
 -- {{{ Hard drive usage textbox
-hdwidget = awful.widget.watch("bash -c \"df | grep '/dev/nvme1n1p2\\|/dev/nvme0n1'\"", 5, function(widget, stdout)
-    stats = parse_filtered_df(stdout)
-    main = stats["/dev/nvme1n1p2"]
-    main_total = main[1] / 1000000
-    main_used = main[2] / 1000000
-    main_pct = main[3]
-    storage = stats["/dev/nvme0n1"]
-    storage_total = storage[1] / 1000000
-    storage_used = storage[2] / 1000000
-    storage_pct = storage[3]
-    --widget:set_markup(stdout)
+hdwidget = awful.widget.watch("bash -c \"df | grep '/$\\|/mnt/storage$'\"", 5, function(widget, stdout)
+    local stats = parse_filtered_df(stdout)
+    local main = stats["/"]
+    local main_total = main[1] / 1000000
+    local main_used = main[2] / 1000000
+    local storage = stats["/mnt/storage"]
+    local storage_total = storage[1] / 1000000
+    local storage_used = storage[2] / 1000000
     widget:set_markup(string.format("<b>main:</b> %.1f / %.1f GB <b>storage:</b> %.1f / %.1f GB", main_used, main_total, storage_used, storage_total))
 end)
 -- }}}

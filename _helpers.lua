@@ -32,7 +32,7 @@ function parse_free(output)
 end
 
 
-function parse_filtered_df(output)
+function parse_filtered_df(output, mountpoints)
     -- Parse the output of `df | grep "<mountpoint1>$|<mountpoint2>$"` (ie, output that has been filtered to
     -- only the relevant filesystems). Returns a {filesystem, used, total, pct} table for each
     -- given filesystem. Values are returned in KB.
@@ -45,8 +45,10 @@ function parse_filtered_df(output)
     
     for line in output:gmatch("[^\r\n]+") do
         local _, _, total, used, pct, mp = string.find(line, "^%S+%s+(%d+)%s+(%d+)%s+%d+%s+(%d+%%)%s+(%S+)")
-        stats[mp] = {tonumber(total), tonumber(used), pct}
-    
+        local fs_name = mountpoints[mp]
+        if fs_name ~= nil then 
+            stats[fs_name] = {tonumber(total), tonumber(used), pct}
+        end
     end
     return stats
 end

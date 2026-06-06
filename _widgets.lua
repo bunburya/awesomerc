@@ -90,25 +90,42 @@ function update_bat_widget(widget, status)
 	widget:set_markup(text)
 end
 
-local upmon_cmd = "/usr/bin/upmon -p /org/freedesktop/UPower/devices/battery_BAT0 Percentage,State"
+local dbus = dbus
 
-awful.spawn.with_line_callback(upmon_cmd, { stdout = function(line) 
-    if not bat_status.present then bat_status = true end
-    local dis_charge = string.match(line, "State=(%a+)")
-    if dis_charge ~= nil then bat_status.dis_charge = dis_charge end
-    local level = string.match(line, "Percentage=(%d+)")
-    if level ~= nil then bat_status.level = tonumber(level) end
-    update_bat_widget(bat_level, bat_status)
-end })
+dbus.add_match(
+    "system",
+    "type='signal',"
+        .."interface='org.freedesktop.DBus.Properties',"
+        .."member='PropertiesChanged',"
+        .."path='/org/freedesktop/UPower/devices/battery_BAT0'"
+)
+
+local dbus_vals = {
+    "Unknown",
+    "Charging",
+    "Discharging",
+    "Empty",
+    "FullyCharged",
+    "PendingCharge",
+    "PendingDischarge"
+}
+dbus.connect_signal("org.freedesktop.DBus.Properties", function(...)
+    local args = { ... }
+    if args[1].path ~= "/org/freedesktop/UPower/devices/battery_BAT0" then return end
+    local values = args[3]
+    if values["State"] ~= nil then bat_status.dis_charge = dbus_vals[values["State"]+1] end
+    if values["Percentage"] ~= nil then bat_status.level = math.ceil(values["Percentage"]) end
+
+    update_bat_widget(bat_level_textbox, bat_status)
+end)
+
+bat_icon_imagebox = wibox.widget.imagebox()
+bat_icon_imagebox:set_image("/home/alan/.config/awesome/themes/custom/battery.png")
+bat_level_textbox = wibox.widget.textbox()
 
 
-bat_icon = wibox.widget.imagebox()
-bat_icon:set_image("/home/alan/.config/awesome/themes/custom/battery.png")
-bat_level = wibox.widget.textbox()
-
-
-bat_widget = {bat_icon, bat_level}
-update_bat_widget(bat_level, bat_status)
+bat_widget = {bat_icon_imagebox, bat_level_textbox}
+update_bat_widget(bat_level_textbox, bat_status)
 
 -- }}}
 
@@ -170,12 +187,13 @@ end)
 -- }}}
 
 -- {{{ Hard drive usage textbox
-hdwidget = awful.widget.watch("bash -c \"df | grep '/$\\|/mnt/storage$'\"", 5, function(widget, stdout)
-    local stats = parse_filtered_df(stdout)
-    local main = stats["/"]
+local mountpoints = { ["/"] = "main", ["/mnt/storage"] = "storage" }
+hdwidget = awful.widget.watch("df", 5, function(widget, stdout)
+    local stats = parse_filtered_df(stdout, mountpoints)
+    local main = stats["main"]
     local main_total = main[1] / 1000000
     local main_used = main[2] / 1000000
-    local storage = stats["/mnt/storage"]
+    local storage = stats["storage"]
     local storage_total = storage[1] / 1000000
     local storage_used = storage[2] / 1000000
     widget:set_markup(string.format("<b>main:</b> %.1f / %.1f GB <b>storage:</b> %.1f / %.1f GB", main_used, main_total, storage_used, storage_total))
